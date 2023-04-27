@@ -322,6 +322,9 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
+# Corbertura coverage reports
+coverage/
+
 # OpenCover UI analysis results
 OpenCover/
 
