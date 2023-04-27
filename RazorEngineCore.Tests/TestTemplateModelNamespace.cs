@@ -5,14 +5,14 @@ namespace RazorEngineCore.Tests
     public class TestTemplateModelNamespace
     {
         [Fact]
-        public void TestModelNestedTypes()
+        public void Compile_Returns_GivenNestedTypeModel()
         {
-            IRazorEngine razorEngine = new RazorEngine();
+            // Arrange
             string content = "Hello @Model.Name";
+            var template = new RazorEngine().Compile<RazorEngineTemplateBase<NestedTestModel.TestModelInnerClass1.TestModelInnerClass2>>(content);
 
-            IRazorEngineCompiledTemplate<RazorEngineTemplateBase<NestedTestModel.TestModelInnerClass1.TestModelInnerClass2>> template2 = razorEngine.Compile<RazorEngineTemplateBase<NestedTestModel.TestModelInnerClass1.TestModelInnerClass2>>(content);
-
-            string result = template2.Run(instance =>
+            // Act
+            string result = template.Run(instance =>
             {
                 instance.Model = new NestedTestModel.TestModelInnerClass1.TestModelInnerClass2()
                 {
@@ -20,18 +20,19 @@ namespace RazorEngineCore.Tests
                 };
             });
 
+            // Assert
             result.Should().Be("Hello Hello");
         }
 
         [Fact]
-        public void TestModelNoNamespace()
+        public void Compile_Returns_GivenModelWithoutNamespace()
         {
-            IRazorEngine razorEngine = new RazorEngine();
+            // Arrange
             string content = "Hello @Model.Name";
+            var template = new RazorEngine().Compile<RazorEngineTemplateBase<TestModelWithoutNamespace>>(content);
 
-            IRazorEngineCompiledTemplate<RazorEngineTemplateBase<TestModelWithoutNamespace>> template2 = razorEngine.Compile<RazorEngineTemplateBase<TestModelWithoutNamespace>>(content);
-
-            string result = template2.Run(instance =>
+            // Act
+            string result = template.Run(instance =>
             {
                 instance.Model = new TestModelWithoutNamespace()
                 {
@@ -39,6 +40,7 @@ namespace RazorEngineCore.Tests
                 };
             });
 
+            // Assert
             result.Should().Be("Hello Hello");
         }
     }

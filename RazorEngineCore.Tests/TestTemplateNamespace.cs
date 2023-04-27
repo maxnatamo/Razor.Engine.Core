@@ -5,28 +5,38 @@ namespace RazorEngineCore.Tests
     public class TestTemplateNamespace
     {
         [Fact]
-        public void TestSettingTemplateNamespace()
+        public void Compile_ReturnsValue_GivenVariableExpansion()
         {
-            RazorEngine razorEngine = new RazorEngine();
+            // Arrange
+            var initialTemplate = new RazorEngine().Compile(
+                "@{ var message = \"OK\"; }@message",
+                builder =>
+                {
+                    builder.Options.TemplateNamespace = "Test.Namespace";
+                });
 
-            IRazorEngineCompiledTemplate initialTemplate = razorEngine.Compile("@{ var message = \"OK\"; }@message",
-                builder => { builder.Options.TemplateNamespace = "Test.Namespace"; });
-
+            // Act
             var result = initialTemplate.Run();
 
+            // Assert
             result.Should().Be("OK");
         }
 
         [Fact]
-        public void TestSettingTemplateNamespaceT()
+        public void Compile_ReturnsValue_GivenVariableExpansionWithType()
         {
-            RazorEngine razorEngine = new RazorEngine();
+            // Arrange
+            var initialTemplate = new RazorEngine().Compile<TestTemplate2>(
+                "@{ var message = \"OK\"; }@message",
+                builder =>
+                {
+                    builder.Options.TemplateNamespace = "Test.Namespace";
+                });
 
-            var initialTemplate = razorEngine.Compile<TestTemplate2>("@{ var message = \"OK\"; }@message",
-                builder => { builder.Options.TemplateNamespace = "Test.Namespace"; });
-
+            // Act
             var result = initialTemplate.Run(a => { });
 
+            // Assert
             result.Should().Be("OK");
         }
     }

@@ -3,17 +3,16 @@
     public class TestSaveLoad
     {
         [Fact]
-        public void TestSaveToStream()
+        public void SaveToStream_ReturnsSameTemplate_GivenTemplate()
         {
             // Arrange
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate initialTemplate = razorEngine.Compile("Hello @Model.Name");
-            
+            var initialTemplate = new RazorEngine().Compile("Hello @Model.Name");
+
             MemoryStream memoryStream = new MemoryStream();
             initialTemplate.SaveToStream(memoryStream);
             memoryStream.Position = 0;
 
-            IRazorEngineCompiledTemplate loadedTemplate = RazorEngineCompiledTemplate.LoadFromStream(memoryStream);
+            var loadedTemplate = RazorEngineCompiledTemplate.LoadFromStream(memoryStream);
 
             // Act
             string initialTemplateResult = initialTemplate.Run(new { Name = "Alex" });
@@ -24,52 +23,54 @@
         }
 
         [Fact]
-        public async Task TestSaveToStreamAsync()
+        public async Task SaveToStreamAsync_ReturnsSameTemplate_GivenTemplate()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate initialTemplate = await razorEngine.CompileAsync("Hello @Model.Name");
+            // Arrange
+            var initialTemplate = await new RazorEngine().CompileAsync("Hello @Model.Name");
 
             MemoryStream memoryStream = new MemoryStream();
             await initialTemplate.SaveToStreamAsync(memoryStream);
             memoryStream.Position = 0;
 
-            IRazorEngineCompiledTemplate loadedTemplate = await RazorEngineCompiledTemplate.LoadFromStreamAsync(memoryStream);
+            var loadedTemplate = await RazorEngineCompiledTemplate.LoadFromStreamAsync(memoryStream);
 
+            // Act
             string initialTemplateResult = await initialTemplate.RunAsync(new { Name = "Alex" });
             string loadedTemplateResult = await loadedTemplate.RunAsync(new { Name = "Alex" });
 
+            // Assert
             initialTemplateResult.Should().BeEquivalentTo(loadedTemplateResult);
         }
 
         [Fact]
-        public void TestSaveToFile()
+        public void SaveToFile_ReturnsSameTemplate_GivenTemplate()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate initialTemplate = razorEngine.Compile("Hello @Model.Name");
-
+            // Arrange
+            var initialTemplate = new RazorEngine().Compile("Hello @Model.Name");
             initialTemplate.SaveToFile("testTemplate.dll");
+            var loadedTemplate = RazorEngineCompiledTemplate.LoadFromFile("testTemplate.dll");
 
-            IRazorEngineCompiledTemplate loadedTemplate = RazorEngineCompiledTemplate.LoadFromFile("testTemplate.dll");
-
+            // Act
             string initialTemplateResult = initialTemplate.Run(new { Name = "Alex" });
             string loadedTemplateResult = loadedTemplate.Run(new { Name = "Alex" });
 
+            // Assert
             initialTemplateResult.Should().BeEquivalentTo(loadedTemplateResult);
         }
 
         [Fact]
-        public async Task TestSaveToFileAsync()
+        public async Task SaveToFileAsync_ReturnsSameTemplate_GivenTemplate()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate initialTemplate = await razorEngine.CompileAsync("Hello @Model.Name");
-            
+            // Arrange
+            var initialTemplate = await new RazorEngine().CompileAsync("Hello @Model.Name");
             await initialTemplate.SaveToFileAsync("testTemplate.dll");
+            var loadedTemplate = await RazorEngineCompiledTemplate.LoadFromFileAsync("testTemplate.dll");
 
-            IRazorEngineCompiledTemplate loadedTemplate = await RazorEngineCompiledTemplate.LoadFromFileAsync("testTemplate.dll");
-
+            // Act
             string initialTemplateResult = await initialTemplate.RunAsync(new { Name = "Alex" });
             string loadedTemplateResult = await loadedTemplate.RunAsync(new { Name = "Alex" });
 
+            // Assert
             initialTemplateResult.Should().BeEquivalentTo(loadedTemplateResult);
         }
     }

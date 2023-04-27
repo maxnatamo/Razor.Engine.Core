@@ -3,7 +3,7 @@
     public class TestTemplateFilename
     {
         [Fact]
-        public void TestSettingTemplateFilename()
+        public void Compile_ThrowsException_GivenSyntaxError()
         {
             // Arrange
             RazorEngine razorEngine = new RazorEngine();

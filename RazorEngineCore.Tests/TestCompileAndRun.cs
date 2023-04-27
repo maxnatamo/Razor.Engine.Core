@@ -1,178 +1,132 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+
 using RazorEngineCore.Tests.Models;
 
 namespace RazorEngineCore.Tests
 {
-    using System.Runtime.InteropServices;
-
     public class TestCompileAndRun
     {
         [Fact]
-        public void TestCompile()
+        public void Compile_DoesntThrow()
         {
+            // Arrange
             RazorEngine razorEngine = new RazorEngine();
-            razorEngine.Compile("Hello @Model.Name");
+
+            // Act
+            Action act = () => razorEngine.Compile("Hello @Model.Name");
+
+            // Assert
+            act.Should().NotThrow();
         }
 
         [Fact]
-        public Task TestCompileAsync()
+        public async Task CompileAsync_DoesntThrow()
         {
+            // Arrange
             RazorEngine razorEngine = new RazorEngine();
-            return razorEngine.CompileAsync("Hello @Model.Name");
+
+            // Act
+            Func<Task> act = async () => await razorEngine.CompileAsync("Hello @Model.Name");
+
+            // Assert
+            await act.Should().NotThrowAsync();
         }
 
         [Fact]
-        public void TestCompileAndRun_HtmlLiteral()
+        public void Compile_Returns_GivenHtmlLiteral()
         {
+            // Arrange
             IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<h1>Hello @Model.Name</h1>");
 
-            string actual = template.Run(new
-            {
-                Name = "Alex"
-            });
+            // Act
+            string actual = template.Run(new { Name = "Alex" });
 
+            // Assert
             actual.Should().Be("<h1>Hello Alex</h1>");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_HtmlLiteralAsync()
+        public void Compile_Returns_GivenInAttributeVariables()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = await razorEngine.CompileAsync("<h1>Hello @Model.Name</h1>");
+            // Arrange
+            string content = "<div class=\"circle\" style=\"background-color: hsla(@Model.Colour, 70%,   80%,1);\">";
+            IRazorEngineCompiledTemplate template = new RazorEngine().Compile(content);
 
-            string actual = await template.RunAsync(new
-            {
-                Name = "Alex"
-            });
+            // Act
+            string actual = template.Run(new { Colour = 88 });
 
-            actual.Should().Be("<h1>Hello Alex</h1>");
-        }
-
-        [Fact]
-        public void TestCompileAndRun_InAttributeVariables()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = razorEngine.Compile("<div class=\"circle\" style=\"background-color: hsla(@Model.Colour, 70%,   80%,1);\">");
-
-            string actual = template.Run(new
-            {
-                Colour = 88
-            });
-
+            // Assert
             actual.Should().Be("<div class=\"circle\" style=\"background-color: hsla(88, 70%,   80%,1);\">");
         }
 
         [Fact]
-        public void TestCompileAndRun_InAttributeVariables2()
+        public void Compile_Returns_GivenInAttributeVariables2()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = razorEngine.Compile("<img src='@(\"test\")'>");
+            // Arrange
+            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<img src='@(\"test\")'>");
 
-            string actual = template.Run(new
-            {
-                Colour = 88
-            });
+            // Act
+            string actual = template.Run(new { Colour = 88 });
 
+            // Assert
             actual.Should().Be("<img src='test'>");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_InAttributeVariablesAsync()
+        public void Compile_Returns_GivenHtmlAttribute()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = await razorEngine.CompileAsync("<div class=\"circle\" style=\"background-color: hsla(@Model.Colour, 70%,   80%,1);\">");
+            // Arrange
+            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<div title=\"@Model.Name\">Hello</div>");
 
-            string actual = await template.RunAsync(new
-            {
-                Colour = 88
-            });
+            // Act
+            string actual = template.Run(new { Name = "Alex" });
 
-            actual.Should().Be("<div class=\"circle\" style=\"background-color: hsla(88, 70%,   80%,1);\">");
-        }
-
-        [Fact]
-        public void TestCompileAndRun_HtmlAttribute()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = razorEngine.Compile("<div title=\"@Model.Name\">Hello</div>");
-
-            string actual = template.Run(new
-            {
-                Name = "Alex"
-            });
-
+            // Assert
             actual.Should().Be("<div title=\"Alex\">Hello</div>");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_HtmlAttributeAsync()
+        public void Compile_Returns_GivenPlainDynamicModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = await razorEngine.CompileAsync("<div title=\"@Model.Name\">Hello</div>");
+            // Assert
+            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("Hello @Model.Name");
 
-            string actual = await template.RunAsync(new
-            {
-                Name = "Alex"
-            });
+            // Act
+            string actual = template.Run(new { Name = "Alex" });
 
-            actual.Should().Be("<div title=\"Alex\">Hello</div>");
-        }
-
-        [Fact]
-        public void TestCompileAndRun_DynamicModel_Plain()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = razorEngine.Compile("Hello @Model.Name");
-
-            string actual = template.Run(new
-            {
-                Name = "Alex"
-            });
-
+            // Assert
             actual.Should().Be("Hello Alex");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_DynamicModel_PlainAsync()
+        public void Compile_Returns_GivenStructList()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = await razorEngine.CompileAsync("Hello @Model.Name");
-
-            string actual = await template.RunAsync(new
-            {
-                Name = "Alex"
-            });
-
-            actual.Should().Be("Hello Alex");
-        }
-
-        public struct Item
-        {
-            public string Name { get; set; }
-        }
-
-        [Fact]
-        public void TestCompileAndRun_StructList()
-        {
-            var eng = new RazorEngine();
+            // Arrange
             var model = new
             {
-                Items = new[] { new Item { Name = "Bob" }, new Item { Name = "Alice" } }
+                Items = new[]
+                {
+                    new Item { Name = "Bob" },
+                    new Item { Name = "Alice" }
+                }
             };
-            var temp = eng.Compile("@foreach(var item in Model.Items) { @item.Name }");
-            var result = temp.Run(model);
+            var template = new RazorEngine().Compile("@foreach(var item in Model.Items) { @item.Name }");
 
+            // Act
+            var result = template.Run(model);
+
+            // Assert
             result.Should().Be("BobAlice");
         }
 
         [Fact]
-        public void TestCompileAndRun_DynamicModel_Nested()
+        public void Compile_Returns_GivenNestedDynamicModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
-
+            // Arrange
             var model = new
             {
                 Name = "Alex",
@@ -182,127 +136,73 @@ namespace RazorEngineCore.Tests
                 }
             };
 
-            var template = razorEngine.Compile("Name: @Model.Name, Membership: @Model.Membership.Level");
+            var template = new RazorEngine().Compile("Name: @Model.Name, Membership: @Model.Membership.Level");
 
+            // Act
             string actual = template.Run(model);
 
+            // Assert
             actual.Should().Be("Name: Alex, Membership: Gold");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_DynamicModel_NestedAsync()
+        public void Compile_Returns_GivenNullModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
+            // Arrange
+            var template = new RazorEngine().Compile("Name: @Model");
 
-            var model = new
-            {
-                Name = "Alex",
-                Membership = new
-                {
-                    Level = "Gold"
-                }
-            };
-
-            var template = await razorEngine.CompileAsync("Name: @Model.Name, Membership: @Model.Membership.Level");
-
-            string actual = await template.RunAsync(model);
-
-            actual.Should().Be("Name: Alex, Membership: Gold");
-        }
-
-        [Fact]
-        public void TestCompileAndRun_NullModel()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-
-            var template = razorEngine.Compile("Name: @Model");
-
+            // Act
             string actual = template.Run(null);
 
+            // Assert
             actual.Should().Be("Name: ");
         }
 
         [Fact]
-        public void TestCompileAndRun_NullablePropertyWithValue()
+        public void Compile_Returns_GivenNullablePropertyWithValue()
         {
-            RazorEngine razorEngine = new RazorEngine();
+            // Arrange
+            DateTime? dateTime = DateTime.Now;
+            var template = new RazorEngine().Compile<TestTemplate2>("DateTime: @Model.DateTime.Value.ToString()");
 
-            DateTime dateTime = DateTime.Now;
+            // Act
+            string actual = template.Run(instance => instance.Model = new TestModel() { DateTime = dateTime });
 
-            IRazorEngineCompiledTemplate<TestTemplate2> template = razorEngine.Compile<TestTemplate2>("DateTime: @Model.DateTime.Value.ToString()");
-
-            string actual = template.Run(instance => instance.Model = new TestModel()
-            {
-                DateTime = dateTime
-            });
-
-            actual.Should().Be($"DateTime: {dateTime}");
+            // Assert
+            actual.Should().Be($"DateTime: {dateTime.ToString()}");
         }
 
         [Fact]
-        public void TestCompileAndRun_NullablePropertyWithoutValue()
+        public void Compile_Returns_GivenNullablePropertyWithoutValue()
         {
-            RazorEngine razorEngine = new RazorEngine();
-
+            // Arrange
             DateTime? dateTime = null;
+            var template = new RazorEngine().Compile<TestTemplate2>("DateTime: @Model.DateTime");
 
-            IRazorEngineCompiledTemplate<TestTemplate2> template = razorEngine.Compile<TestTemplate2>("DateTime: @Model.DateTime");
+            // Act
+            string actual = template.Run(instance => instance.Model = new TestModel() { DateTime = dateTime });
 
-            string actual = template.Run(instance => instance.Model = new TestModel()
-            {
-                    DateTime = dateTime
-            });
-
-            actual.Should().Be($"DateTime: {dateTime}");
+            // Assert
+            actual.Should().Be($"DateTime: {dateTime.ToString()}");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_NullModelAsync()
+        public void Compile_Returns_GivenNullNestedModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
+            // Arrange
+            var template = new RazorEngine().Compile("Name: @Model.user");
 
-            var template = await razorEngine.CompileAsync("Name: @Model");
+            // Act
+            string actual = template.Run(new { user = (object?) null });
 
-            string actual = await template.RunAsync(null);
-
+            // Assert
             actual.Should().Be("Name: ");
         }
 
         [Fact]
-        public void TestCompileAndRun_NullNestedObject()
+        public void Compile_Returns_GivenListModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
-
-            var template = razorEngine.Compile("Name: @Model.user");
-
-            string actual = template.Run(new
-            {
-                user = (object)null
-            });
-
-            actual.Should().Be("Name: ");
-        }
-
-        [Fact]
-        public async Task TestCompileAndRun_NullNestedObjectAsync()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-
-            var template = await razorEngine.CompileAsync("Name: @Model.user");
-
-            string actual = await template.RunAsync(new
-            {
-                user = (object)null
-            });
-
-            actual.Should().Be("Name: ");
-        }
-
-        [Fact]
-        public void TestCompileAndRun_DynamicModel_Lists()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-
+            // Arrange
             var model = new
             {
                 Items = new[]
@@ -318,62 +218,28 @@ namespace RazorEngineCore.Tests
                 }
             };
 
-            var template = razorEngine.Compile(@"
+            string expected = @"
+    <div>K1</div>
+    <div>K2</div>
+";
+
+            var template = new RazorEngine().Compile(@"
 @foreach (var item in Model.Items)
 {
-<div>@item.Key</div>
-}
-");
+    <div>@item.Key</div>
+}");
 
+            // Act
             string actual = template.Run(model);
-            string expected = @"
-<div>K1</div>
-<div>K2</div>
-";
+
+            // Assert
             actual.Should().Be(expected);
         }
 
         [Fact]
-        public async Task TestCompileAndRun_DynamicModel_ListsAsync()
+        public void Compile_Returns_GivenDictionaryModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
-
-            var model = new
-            {
-                Items = new[]
-                {
-                    new
-                    {
-                        Key = "K1"
-                    },
-                    new
-                    {
-                        Key = "K2"
-                    }
-                }
-            };
-
-            var template = await razorEngine.CompileAsync(@"
-@foreach (var item in Model.Items)
-{
-<div>@item.Key</div>
-}
-");
-
-            string actual = await template.RunAsync(model);
-            string expected = @"
-<div>K1</div>
-<div>K2</div>
-";
-            actual.Should().Be(expected);
-        }
-
-
-        [Fact]
-        public void TestCompileAndRun_DynamicModel_Dictionary1()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-
+            // Arrange
             var model = new
             {
                 Dictionary = new Dictionary<string, object>()
@@ -383,7 +249,14 @@ namespace RazorEngineCore.Tests
                 }
             };
 
-            var template = razorEngine.Compile(@"
+            string expected = @"
+<div>K1</div>
+<div>K2</div>
+<div>V1</div>
+<div>V2</div>
+";
+
+            var template = new RazorEngine().Compile(@"
 @foreach (var key in Model.Dictionary.Keys)
 {
 <div>@key</div>
@@ -392,22 +265,17 @@ namespace RazorEngineCore.Tests
 <div>@Model.Dictionary[""K2""]</div>
 ");
 
+            // Act
             string actual = template.Run(model);
-            string expected = @"
-<div>K1</div>
-<div>K2</div>
-<div>V1</div>
-<div>V2</div>
-";
+
+            // Assert
             actual.Should().Be(expected);
         }
 
-
         [Fact]
-        public void TestCompileAndRun_DynamicModel_Dictionary2()
+        public void Compile_Returns_GivenDictionaryModelWithObjectValues()
         {
-            RazorEngine razorEngine = new RazorEngine();
-
+            // Arrange
             var model = new
             {
                 Dictionary = new Dictionary<string, object>()
@@ -417,25 +285,28 @@ namespace RazorEngineCore.Tests
                 }
             };
 
-            var template = razorEngine.Compile(@"
-<div>@Model.Dictionary[""K1""].x</div>
-<div>@Model.Dictionary[""K2""].x</div>
-");
-
-            string actual = template.Run(model);
             string expected = @"
 <div>1</div>
 <div>2</div>
 ";
+
+            var template = new RazorEngine().Compile(@"
+<div>@Model.Dictionary[""K1""].x</div>
+<div>@Model.Dictionary[""K2""].x</div>
+");
+
+            // Act
+            string actual = template.Run(model);
+
+            // Assert
             actual.Should().Be(expected);
         }
 
         [Fact]
-        public void TestCompileAndRun_TestFunction()
+        public void Compile_Returns_GivenFunction()
         {
-            RazorEngine razorEngine = new RazorEngine();
-
-            var template = razorEngine.Compile(@"
+            // Arrange
+            var template = new RazorEngine().Compile(@"
 @<area>
     @{ RecursionTest(3); }
 </area>
@@ -455,7 +326,6 @@ void RecursionTest(int level)
 
 }");
 
-            string actual = template.Run();
             string expected = @"
 <area>
     <div>LEVEL: 3</div>
@@ -463,15 +333,21 @@ void RecursionTest(int level)
     <div>LEVEL: 1</div>
 </area>
 ";
+
+            // Act
+            string actual = template.Run();
+
+            // Assert
             actual.Trim().Should().Be(expected.Trim());
         }
 
         [Fact]
-        public void TestCompileAndRun_TypedModel1()
+        public void Compile_Returns_GivenTypedModelAction()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate1> template = razorEngine.Compile<TestTemplate1>("Hello @A @B @(A + B) @C @Decorator(\"777\")");
+            // Arrange
+            var template = new RazorEngine().Compile<TestTemplate1>("Hello @A @B @(A + B) @C @Decorator(\"777\")");
 
+            // Act
             string actual = template.Run(instance =>
             {
                 instance.A = 1;
@@ -479,31 +355,17 @@ void RecursionTest(int level)
                 instance.C = "Alex";
             });
 
+            // Assert
             actual.Should().Be("Hello 1 2 3 Alex -=777=-");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_TypedModel1Async()
+        public void Compile_Returns_GivenTypedModelInitialize()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate1> template = await razorEngine.CompileAsync<TestTemplate1>("Hello @A @B @(A + B) @C @Decorator(\"777\")");
+            // Arrange
+            var template = new RazorEngine().Compile<TestTemplate2>("Hello @Model.Decorator(Model.C)");
 
-            string actual = await template.RunAsync(instance =>
-            {
-                instance.A = 1;
-                instance.B = 2;
-                instance.C = "Alex";
-            });
-
-            actual.Should().Be("Hello 1 2 3 Alex -=777=-");
-        }
-
-        [Fact]
-        public void TestCompileAndRun_TypedModel2()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate2> template = razorEngine.Compile<TestTemplate2>("Hello @Model.Decorator(Model.C)");
-
+            // Act
             string actual = template.Run(instance =>
             {
                 instance.Initialize(new TestModel
@@ -512,53 +374,71 @@ void RecursionTest(int level)
                 });
             });
 
+            // Assert
             actual.Should().Be("Hello -=Alex=-");
         }
 
         [Fact]
-        public void TestCompileAndRun_TypedModel3()
+        public void Compile_Returns_GivenTypedModelConstructor()
         {
+            // Arrange
             string templateText = @"
 @inherits RazorEngineCore.RazorEngineTemplateBase<RazorEngineCore.Tests.Models.TestModel>
 Hello @Model.Decorator(Model.C)
 ";
+            
+            var template = new RazorEngine().Compile<RazorEngineTemplateBase<TestModel>>(templateText);
 
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<RazorEngineTemplateBase<TestModel>> template = razorEngine.Compile<RazorEngineTemplateBase<TestModel>>(templateText);
-
+            // Act
             string actual = template.Run(instance =>
             {
                 instance.Model = new TestModel
                 {
-                        C = "Alex"
+                    C = "Alex"
                 };
             });
 
+            // Assert
             actual.Trim().Should().Be("Hello -=Alex=-");
         }
 
         [Fact]
-        public async Task TestCompileAndRun_TypedModel2Async()
+        public void Compile_Returns_GivenAnonymousObjectWithObjectArray()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate2> template = await razorEngine.CompileAsync<TestTemplate2>("Hello @Model.Decorator(Model.C)");
+            // Arrange
+            var template = new RazorEngine().Compile<TestTemplate2>(
+@"
+@foreach (var item in Model.Numbers.OrderByDescending(x => x))
+{
+    <p>@item</p>
+}
+");
 
-            string actual = await template.RunAsync(instance =>
+            string expected = @"
+    <p>3</p>
+    <p>2</p>
+    <p>1</p>
+";
+
+            // Act
+            string actual = template.Run(instance =>
             {
                 instance.Initialize(new TestModel
                 {
-                    C = "Alex"
+                    Numbers = new[] { 2, 1, 3 }
                 });
             });
 
-            actual.Should().Be("Hello -=Alex=-");
+            // Assert
+            actual.Should().Be(expected);
         }
 
+
         [Fact]
-        public void TestCompileAndRun_AnonymousModelWithArrayOfObjects()
+        public void Compile_Returns_GivenTypedLinqModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate2> template = razorEngine.Compile<TestTemplate2>(
+            // Arrange
+            var template = new RazorEngine().Compile<TestTemplate2>(
 @"
 @foreach (var item in Model.Numbers.OrderByDescending(x => x))
 {
@@ -570,6 +450,8 @@ Hello @Model.Decorator(Model.C)
     <p>2</p>
     <p>1</p>
 ";
+
+            // Act
             string actual = template.Run(instance =>
             {
                 instance.Initialize(new TestModel
@@ -578,42 +460,15 @@ Hello @Model.Decorator(Model.C)
                 });
             });
 
-            actual.Should().Be(expected);
-        }
-
-
-        [Fact]
-        public void TestCompileAndRun_StronglyTypedModelLinq()
-        {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate2> template = razorEngine.Compile<TestTemplate2>(
-@"
-@foreach (var item in Model.Numbers.OrderByDescending(x => x))
-{
-    <p>@item</p>
-}
-");
-            string expected = @"
-    <p>3</p>
-    <p>2</p>
-    <p>1</p>
-";
-            string actual = template.Run(instance =>
-            {
-                instance.Initialize(new TestModel
-                {
-                    Numbers = new[] { 2, 1, 3 }
-                });
-            });
-
+            // Assert
             actual.Should().Be(expected);
         }
 
         [Fact]
-        public void TestCompileAndRun_DynamicModelLinq()
+        public void Compile_Returns_GivenDynamicLinqModel()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = razorEngine.Compile(
+            // Arrange
+            var template = new RazorEngine().Compile(
 @"
 @foreach (var item in ((IEnumerable<object>)Model.Numbers).OrderByDescending(x => x))
 {
@@ -625,44 +480,21 @@ Hello @Model.Decorator(Model.C)
     <p>2</p>
     <p>1</p>
 ";
+
+            // Act
             string actual = template.Run(new
             {
                     Numbers = new List<object>() {2, 1, 3}
             });
 
+            // Assert
             actual.Should().Be(expected);
         }
 
         [Fact]
-        public async Task TestCompileAndRun_LinqAsync()
+        public async Task Compile_Returns_GivenMetadataReference()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate<TestTemplate2> template = await razorEngine.CompileAsync<TestTemplate2>(
-@"
-@foreach (var item in Model.Numbers.OrderByDescending(x => x))
-{
-    <p>@item</p>
-}
-");
-            string expected = @"
-    <p>3</p>
-    <p>2</p>
-    <p>1</p>
-";
-            string actual = await template.RunAsync(instance =>
-            {
-                instance.Initialize(new TestModel
-                {
-                    Numbers = new[] { 2, 1, 3 }
-                });
-            });
-
-            actual.Should().Be(expected);
-        }
-
-        [Fact]
-        public async Task TestCompileAndRun_MetadataReference()
-        {
+            // Arrange
             string greetingClass = @"
 namespace TestAssembly
 {
@@ -675,6 +507,11 @@ namespace TestAssembly
     }
 }
 ";
+
+            string expected = @"
+<p>Hello, Name!</p>
+";
+
             // This needs to be done in the builder to have access to all of the assemblies added through
             // the various AddAssemblyReference options
             CSharpCompilation compilation = CSharpCompilation.Create(
@@ -703,8 +540,7 @@ namespace TestAssembly
                             ? Assembly.Load(memoryStream.ToArray())
                             : null;
 
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = await razorEngine.CompileAsync(@"
+            var template = await new RazorEngine().CompileAsync(@"
 @using TestAssembly
 <p>@Greeting.GetGreeting(""Name"")</p>
 ", builder =>
@@ -713,11 +549,10 @@ namespace TestAssembly
 
             });
 
-            string expected = @"
-<p>Hello, Name!</p>
-";
+            // Act
             string actual = await template.RunAsync();
 
+            // Assert
             actual.Should().Be(expected);
         }
 
