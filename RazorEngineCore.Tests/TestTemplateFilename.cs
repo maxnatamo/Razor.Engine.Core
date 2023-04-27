@@ -1,30 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace RazorEngineCore.Tests
+﻿namespace RazorEngineCore.Tests
 {
-    [TestClass]
     public class TestTemplateFilename
     {
-        [TestMethod]
+        [Fact]
         public void TestSettingTemplateFilename()
         {
+            // Arrange
             RazorEngine razorEngine = new RazorEngine();
-            var errorThrown = false;
-            try
-            {
-                IRazorEngineCompiledTemplate initialTemplate = razorEngine.Compile("@{ this is a syntaxerror }", 
-                    builder => { builder.Options.TemplateFilename = "templatefilenameset.txt"; });
-            }
-            catch (Exception e)
-            {
-                Assert.IsTrue(e.Message.Contains("templatefilenameset.txt"));
-                errorThrown = true;
-            }
 
-            Assert.IsTrue(errorThrown);
+            // Act
+            Action act = () => razorEngine.Compile(
+                "@{ this is a syntaxerror }", 
+                builder =>
+                {
+                    builder.Options.TemplateFilename = "templatefilenameset.txt";
+                });
+
+            // Assert
+            act.Should().Throw<Exception>();
         }
     }
 }

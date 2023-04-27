@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RazorEngineCore.Tests.Models;
+﻿using RazorEngineCore.Tests.Models;
 
 namespace RazorEngineCore.Tests
 {
-    [TestClass]
     public class TestTemplateNamespace
     {
-        [TestMethod]
+        [Fact]
         public void TestSettingTemplateNamespace()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -19,10 +14,10 @@ namespace RazorEngineCore.Tests
 
             var result = initialTemplate.Run();
 
-            Assert.AreEqual("OK", result);
+            result.Should().Be("OK");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestSettingTemplateNamespaceT()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -32,7 +27,7 @@ namespace RazorEngineCore.Tests
 
             var result = initialTemplate.Run(a => { });
 
-            Assert.AreEqual("OK", result);
+            result.Should().Be("OK");
         }
     }
 }

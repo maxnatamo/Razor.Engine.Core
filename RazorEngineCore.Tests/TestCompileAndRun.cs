@@ -1,51 +1,43 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RazorEngineCore.Tests.Models;
 
 namespace RazorEngineCore.Tests
 {
     using System.Runtime.InteropServices;
 
-    [TestClass]
     public class TestCompileAndRun
     {
-        [TestMethod]
+        [Fact]
         public void TestCompile()
         {
             RazorEngine razorEngine = new RazorEngine();
             razorEngine.Compile("Hello @Model.Name");
         }
 
-        [TestMethod]
+        [Fact]
         public Task TestCompileAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
             return razorEngine.CompileAsync("Hello @Model.Name");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_HtmlLiteral()
         {
-            RazorEngine razorEngine = new RazorEngine();
-            IRazorEngineCompiledTemplate template = razorEngine.Compile("<h1>Hello @Model.Name</h1>");
+            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<h1>Hello @Model.Name</h1>");
 
             string actual = template.Run(new
             {
                 Name = "Alex"
             });
 
-            Assert.AreEqual("<h1>Hello Alex</h1>", actual);
+            actual.Should().Be("<h1>Hello Alex</h1>");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_HtmlLiteralAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -56,10 +48,10 @@ namespace RazorEngineCore.Tests
                 Name = "Alex"
             });
 
-            Assert.AreEqual("<h1>Hello Alex</h1>", actual);
+            actual.Should().Be("<h1>Hello Alex</h1>");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_InAttributeVariables()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -70,10 +62,10 @@ namespace RazorEngineCore.Tests
                 Colour = 88
             });
 
-            Assert.AreEqual("<div class=\"circle\" style=\"background-color: hsla(88, 70%,   80%,1);\">", actual);
+            actual.Should().Be("<div class=\"circle\" style=\"background-color: hsla(88, 70%,   80%,1);\">");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_InAttributeVariables2()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -84,10 +76,10 @@ namespace RazorEngineCore.Tests
                 Colour = 88
             });
 
-            Assert.AreEqual("<img src='test'>", actual);
+            actual.Should().Be("<img src='test'>");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_InAttributeVariablesAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -98,10 +90,10 @@ namespace RazorEngineCore.Tests
                 Colour = 88
             });
 
-            Assert.AreEqual("<div class=\"circle\" style=\"background-color: hsla(88, 70%,   80%,1);\">", actual);
+            actual.Should().Be("<div class=\"circle\" style=\"background-color: hsla(88, 70%,   80%,1);\">");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_HtmlAttribute()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -112,10 +104,10 @@ namespace RazorEngineCore.Tests
                 Name = "Alex"
             });
 
-            Assert.AreEqual("<div title=\"Alex\">Hello</div>", actual);
+            actual.Should().Be("<div title=\"Alex\">Hello</div>");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_HtmlAttributeAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -126,10 +118,10 @@ namespace RazorEngineCore.Tests
                 Name = "Alex"
             });
 
-            Assert.AreEqual("<div title=\"Alex\">Hello</div>", actual);
+            actual.Should().Be("<div title=\"Alex\">Hello</div>");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_DynamicModel_Plain()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -140,10 +132,10 @@ namespace RazorEngineCore.Tests
                 Name = "Alex"
             });
 
-            Assert.AreEqual("Hello Alex", actual);
+            actual.Should().Be("Hello Alex");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_DynamicModel_PlainAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -154,7 +146,7 @@ namespace RazorEngineCore.Tests
                 Name = "Alex"
             });
 
-            Assert.AreEqual("Hello Alex", actual);
+            actual.Should().Be("Hello Alex");
         }
 
         public struct Item
@@ -162,7 +154,7 @@ namespace RazorEngineCore.Tests
             public string Name { get; set; }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_StructList()
         {
             var eng = new RazorEngine();
@@ -172,10 +164,11 @@ namespace RazorEngineCore.Tests
             };
             var temp = eng.Compile("@foreach(var item in Model.Items) { @item.Name }");
             var result = temp.Run(model);
-            Assert.AreEqual("BobAlice", result);
+
+            result.Should().Be("BobAlice");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_DynamicModel_Nested()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -193,10 +186,10 @@ namespace RazorEngineCore.Tests
 
             string actual = template.Run(model);
 
-            Assert.AreEqual("Name: Alex, Membership: Gold", actual);
+            actual.Should().Be("Name: Alex, Membership: Gold");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_DynamicModel_NestedAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -214,10 +207,10 @@ namespace RazorEngineCore.Tests
 
             string actual = await template.RunAsync(model);
 
-            Assert.AreEqual("Name: Alex, Membership: Gold", actual);
+            actual.Should().Be("Name: Alex, Membership: Gold");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_NullModel()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -226,27 +219,27 @@ namespace RazorEngineCore.Tests
 
             string actual = template.Run(null);
 
-            Assert.AreEqual("Name: ", actual);
+            actual.Should().Be("Name: ");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_NullablePropertyWithValue()
         {
             RazorEngine razorEngine = new RazorEngine();
 
-            DateTime? dateTime = DateTime.Now;
+            DateTime dateTime = DateTime.Now;
 
             IRazorEngineCompiledTemplate<TestTemplate2> template = razorEngine.Compile<TestTemplate2>("DateTime: @Model.DateTime.Value.ToString()");
 
             string actual = template.Run(instance => instance.Model = new TestModel()
             {
-                    DateTime = dateTime
+                DateTime = dateTime
             });
 
-            Assert.AreEqual("DateTime: " + dateTime, actual);
+            actual.Should().Be($"DateTime: {dateTime}");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_NullablePropertyWithoutValue()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -260,10 +253,10 @@ namespace RazorEngineCore.Tests
                     DateTime = dateTime
             });
 
-            Assert.AreEqual("DateTime: " + dateTime, actual);
+            actual.Should().Be($"DateTime: {dateTime}");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_NullModelAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -272,10 +265,10 @@ namespace RazorEngineCore.Tests
 
             string actual = await template.RunAsync(null);
 
-            Assert.AreEqual("Name: ", actual);
+            actual.Should().Be("Name: ");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_NullNestedObject()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -287,10 +280,10 @@ namespace RazorEngineCore.Tests
                 user = (object)null
             });
 
-            Assert.AreEqual("Name: ", actual);
+            actual.Should().Be("Name: ");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_NullNestedObjectAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -302,10 +295,10 @@ namespace RazorEngineCore.Tests
                 user = (object)null
             });
 
-            Assert.AreEqual("Name: ", actual);
+            actual.Should().Be("Name: ");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_DynamicModel_Lists()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -337,10 +330,10 @@ namespace RazorEngineCore.Tests
 <div>K1</div>
 <div>K2</div>
 ";
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_DynamicModel_ListsAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -372,11 +365,11 @@ namespace RazorEngineCore.Tests
 <div>K1</div>
 <div>K2</div>
 ";
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_DynamicModel_Dictionary1()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -406,11 +399,11 @@ namespace RazorEngineCore.Tests
 <div>V1</div>
 <div>V2</div>
 ";
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_DynamicModel_Dictionary2()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -434,10 +427,10 @@ namespace RazorEngineCore.Tests
 <div>1</div>
 <div>2</div>
 ";
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_TestFunction()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -470,10 +463,10 @@ void RecursionTest(int level)
     <div>LEVEL: 1</div>
 </area>
 ";
-            Assert.AreEqual(expected.Trim(), actual.Trim());
+            actual.Trim().Should().Be(expected.Trim());
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_TypedModel1()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -486,10 +479,10 @@ void RecursionTest(int level)
                 instance.C = "Alex";
             });
 
-            Assert.AreEqual("Hello 1 2 3 Alex -=777=-", actual);
+            actual.Should().Be("Hello 1 2 3 Alex -=777=-");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_TypedModel1Async()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -502,10 +495,10 @@ void RecursionTest(int level)
                 instance.C = "Alex";
             });
 
-            Assert.AreEqual("Hello 1 2 3 Alex -=777=-", actual);
+            actual.Should().Be("Hello 1 2 3 Alex -=777=-");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_TypedModel2()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -519,10 +512,10 @@ void RecursionTest(int level)
                 });
             });
 
-            Assert.AreEqual("Hello -=Alex=-", actual);
+            actual.Should().Be("Hello -=Alex=-");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_TypedModel3()
         {
             string templateText = @"
@@ -541,10 +534,10 @@ Hello @Model.Decorator(Model.C)
                 };
             });
 
-            Assert.AreEqual("Hello -=Alex=-", actual.Trim());
+            actual.Trim().Should().Be("Hello -=Alex=-");
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_TypedModel2Async()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -558,10 +551,10 @@ Hello @Model.Decorator(Model.C)
                 });
             });
 
-            Assert.AreEqual("Hello -=Alex=-", actual);
+            actual.Should().Be("Hello -=Alex=-");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_AnonymousModelWithArrayOfObjects()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -585,11 +578,11 @@ Hello @Model.Decorator(Model.C)
                 });
             });
 
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_StronglyTypedModelLinq()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -613,10 +606,10 @@ Hello @Model.Decorator(Model.C)
                 });
             });
 
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
-        [TestMethod]
+        [Fact]
         public void TestCompileAndRun_DynamicModelLinq()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -637,10 +630,10 @@ Hello @Model.Decorator(Model.C)
                     Numbers = new List<object>() {2, 1, 3}
             });
 
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_LinqAsync()
         {
             RazorEngine razorEngine = new RazorEngine();
@@ -664,10 +657,10 @@ Hello @Model.Decorator(Model.C)
                 });
             });
 
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task TestCompileAndRun_MetadataReference()
         {
             string greetingClass = @"
@@ -725,7 +718,7 @@ namespace TestAssembly
 ";
             string actual = await template.RunAsync();
 
-            Assert.AreEqual(expected, actual);
+            actual.Should().Be(expected);
         }
 
         private static List<MetadataReference> GetMetadataReferences()

@@ -1,12 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RazorEngineCore.Tests.Models;
+﻿using RazorEngineCore.Tests.Models;
 
 namespace RazorEngineCore.Tests
 {
-    [TestClass]
     public class TestTemplateModelNamespace
     {
-        [TestMethod]
+        [Fact]
         public void TestModelNestedTypes()
         {
             IRazorEngine razorEngine = new RazorEngine();
@@ -22,10 +20,10 @@ namespace RazorEngineCore.Tests
                 };
             });
 
-            Assert.AreEqual("Hello Hello", result);
+            result.Should().Be("Hello Hello");
         }
 
-        [TestMethod]
+        [Fact]
         public void TestModelNoNamespace()
         {
             IRazorEngine razorEngine = new RazorEngine();
@@ -41,7 +39,7 @@ namespace RazorEngineCore.Tests
                 };
             });
 
-            Assert.AreEqual("Hello Hello", result);
+            result.Should().Be("Hello Hello");
         }
     }
 }
