@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.CodeAnalysis;
 
 namespace RazorEngineCore
@@ -10,7 +7,7 @@ namespace RazorEngineCore
     {
         public RazorEngineCompilationOptions Options { get; set; }
 
-        public RazorEngineCompilationOptionsBuilder(RazorEngineCompilationOptions options = null)
+        public RazorEngineCompilationOptionsBuilder(RazorEngineCompilationOptions? options = null)
         {
             this.Options = options ?? new RazorEngineCompilationOptions();
         }
@@ -56,7 +53,7 @@ namespace RazorEngineCore
         {
             IList<string> elements = new List<string>()
             {
-                type.Namespace,
+                type.Namespace ?? string.Empty,
                 RenderDeclaringType(type.DeclaringType),
                 type.Name
             };
@@ -76,11 +73,11 @@ namespace RazorEngineCore
             return result + "<" + string.Join(",", type.GenericTypeArguments.Select(this.RenderTypeName)) + ">";
         }
 
-        private string RenderDeclaringType(Type type)
+        private string RenderDeclaringType(Type? type)
         {
             if(type == null)
             {
-                return null;
+                return string.Empty;
             }
 
             string parent = RenderDeclaringType(type.DeclaringType);

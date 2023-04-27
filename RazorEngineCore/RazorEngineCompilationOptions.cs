@@ -6,7 +6,7 @@ namespace RazorEngineCore
 {
     public class RazorEngineCompilationOptions
     {
-        public HashSet<Assembly> ReferencedAssemblies { get; set; }
+        public HashSet<Assembly> ReferencedAssemblies { get; set; } = new HashSet<Assembly>();
 
         public HashSet<MetadataReference> MetadataReferences { get; set; } = new HashSet<MetadataReference>();
         public string TemplateNamespace { get; set; } = "TemplateNamespace";

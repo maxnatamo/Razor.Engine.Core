@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +9,7 @@ namespace RazorEngineCore
         public static ExpandoObject ToExpando(this object obj)
         {
             ExpandoObject expando = new ExpandoObject();
-            IDictionary<string, object> dictionary = expando;
+            IDictionary<string, object?> dictionary = expando;
 
             foreach(PropertyInfo property in obj.GetType().GetProperties())
             {

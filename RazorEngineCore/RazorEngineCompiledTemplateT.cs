@@ -1,21 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace RazorEngineCore
 {
     public class RazorEngineCompiledTemplate<T> : IRazorEngineCompiledTemplate<T> where T : IRazorEngineTemplate
     {
-        private readonly MemoryStream assemblyByteCode;
-        private readonly Type templateType;
+        protected MemoryStream assemblyByteCode { get; set; }
+        protected Type templateType { get; set; }
 
         internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateNamespace)
         {
             this.assemblyByteCode = assemblyByteCode;
 
             Assembly assembly = Assembly.Load(assemblyByteCode.ToArray());
-            this.templateType = assembly.GetType($"{templateNamespace}.Template");
+            this.templateType = assembly.GetType($"{templateNamespace}.Template") ?? throw new InvalidDataException();
         }
 
         public static IRazorEngineCompiledTemplate<T> LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
@@ -91,11 +88,16 @@ namespace RazorEngineCore
 
         public async Task<string> RunAsync(Action<T> initializer)
         {
-            T instance = (T) Activator.CreateInstance(this.templateType);
+            T? instance = (T?) Activator.CreateInstance(this.templateType);
+
+            if(instance == null)
+            {
+                throw new OutOfMemoryException($"Failed to allocate type {this.templateType.Name}");
+            }
+
             initializer(instance);
 
             await instance.ExecuteAsync();
-
             return await instance.ResultAsync();
         }
     }

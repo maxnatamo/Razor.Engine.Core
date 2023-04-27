@@ -1,7 +1,5 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 using System.Reflection;
 
 namespace RazorEngineCore
@@ -15,9 +13,9 @@ namespace RazorEngineCore
             this.model = model;
         }
 
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
+        public override bool TryGetMember(GetMemberBinder binder, out object? result)
         {
-            PropertyInfo propertyInfo = this.model.GetType().GetProperty(binder.Name);
+            PropertyInfo? propertyInfo = this.model.GetType().GetProperty(binder.Name);
 
             if(propertyInfo == null)
             {
@@ -50,9 +48,16 @@ namespace RazorEngineCore
 
                 foreach(object key in keys)
                 {
-                    if(dictionary[key].IsAnonymous())
+                    object? value = dictionary[key];
+
+                    if(value == null)
                     {
-                        dictionary[key] = new AnonymousTypeWrapper(dictionary[key]);
+                        continue;
+                    }
+
+                    if(value.IsAnonymous())
+                    {
+                        dictionary[key] = new AnonymousTypeWrapper(value);
                     }
                 }
             }
@@ -70,7 +75,6 @@ namespace RazorEngineCore
                         })
                         .ToList();
             }
-
 
             return true;
         }

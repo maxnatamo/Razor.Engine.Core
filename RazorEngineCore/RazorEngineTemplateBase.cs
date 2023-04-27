@@ -1,33 +1,37 @@
 ﻿using System.Text;
-using System.Threading.Tasks;
 
 namespace RazorEngineCore
 {
+    public abstract class RazorEngineTemplateBase<T> : RazorEngineTemplateBase
+    {
+        public new T Model { get; set; } = default(T)!;
+    }
+
     public abstract class RazorEngineTemplateBase : IRazorEngineTemplate
     {
         private readonly StringBuilder stringBuilder = new StringBuilder();
 
-        private string attributeSuffix = null;
+        private string attributeSuffix = string.Empty;
 
-        public dynamic Model { get; set; }
+        public dynamic Model { get; set; } = default!;
 
-        public void WriteLiteral(string literal = null)
+        public void WriteLiteral(string? literal = null)
         {
             WriteLiteralAsync(literal).GetAwaiter().GetResult();
         }
 
-        public virtual Task WriteLiteralAsync(string literal = null)
+        public virtual Task WriteLiteralAsync(string? literal = null)
         {
             this.stringBuilder.Append(literal);
             return Task.CompletedTask;
         }
 
-        public void Write(object obj = null)
+        public void Write(object? obj = null)
         {
             WriteAsync(obj).GetAwaiter().GetResult();
         }
 
-        public virtual Task WriteAsync(object obj = null)
+        public virtual Task WriteAsync(object? obj = null)
         {
             this.stringBuilder.Append(obj);
             return Task.CompletedTask;
@@ -67,7 +71,7 @@ namespace RazorEngineCore
         public virtual Task EndWriteAttributeAsync()
         {
             this.stringBuilder.Append(this.attributeSuffix);
-            this.attributeSuffix = null;
+            this.attributeSuffix = string.Empty;
             return Task.CompletedTask;
         }
 

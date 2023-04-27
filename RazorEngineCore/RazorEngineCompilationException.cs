@@ -1,28 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis;
 
 namespace RazorEngineCore
 {
     public class RazorEngineCompilationException : RazorEngineException
     {
-        public RazorEngineCompilationException()
-        {
-        }
 
-        protected RazorEngineCompilationException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+        public List<Diagnostic> Errors { get; set; } = new List<Diagnostic>();
 
-        public RazorEngineCompilationException(Exception innerException) : base(null, innerException)
-        {
-        }
-
-        public List<Diagnostic> Errors { get; set; }
-
-        public string GeneratedCode { get; set; }
+        public string GeneratedCode { get; set; } = string.Empty;
 
         public override string Message
         {
@@ -31,6 +17,21 @@ namespace RazorEngineCore
                 string errors = string.Join("\n", this.Errors.Where(w => w.IsWarningAsError || w.Severity == DiagnosticSeverity.Error));
                 return "Unable to compile template: " + errors;
             }
+        }
+
+        public RazorEngineCompilationException()
+        {
+
+        }
+
+        protected RazorEngineCompilationException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+
+        }
+
+        public RazorEngineCompilationException(Exception innerException) : base(string.Empty, innerException)
+        {
+
         }
     }
 }

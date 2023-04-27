@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace RazorEngineCore
+﻿namespace RazorEngineCore
 {
     public interface IRazorEngineCompiledTemplate<out T> where T : IRazorEngineTemplate
     {

@@ -1,17 +1,16 @@
-﻿using System.Threading.Tasks;
-
-namespace RazorEngineCore
+﻿namespace RazorEngineCore
 {
     public interface IRazorEngineTemplate
     {
         dynamic Model { get; set; }
-        void WriteLiteral(string literal = null);
 
-        Task WriteLiteralAsync(string literal = null);
+        void WriteLiteral(string? literal = null);
 
-        void Write(object obj = null);
+        Task WriteLiteralAsync(string? literal = null);
 
-        Task WriteAsync(object obj = null);
+        void Write(object? obj = null);
+
+        Task WriteAsync(object? obj = null);
 
         void BeginWriteAttribute(string name, string prefix, int prefixOffset, string suffix, int suffixOffset, int attributeValuesCount);
 

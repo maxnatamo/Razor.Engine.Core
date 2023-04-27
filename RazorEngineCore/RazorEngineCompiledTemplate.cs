@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace RazorEngineCore
 {
@@ -15,7 +12,7 @@ namespace RazorEngineCore
             this.assemblyByteCode = assemblyByteCode;
 
             Assembly assembly = Assembly.Load(assemblyByteCode.ToArray());
-            this.templateType = assembly.GetType(templateNamespace + ".Template");
+            this.templateType = assembly.GetType(templateNamespace + ".Template") ?? throw new InvalidDataException();
         }
 
         public static IRazorEngineCompiledTemplate LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
@@ -92,19 +89,24 @@ namespace RazorEngineCore
             }
         }
 
-        public string Run(object model = null)
+        public string Run(object? model = null)
         {
             return this.RunAsync(model).GetAwaiter().GetResult();
         }
 
-        public async Task<string> RunAsync(object model = null)
+        public async Task<string> RunAsync(object? model = null)
         {
             if(model != null && model.IsAnonymous())
             {
                 model = new AnonymousTypeWrapper(model);
             }
 
-            IRazorEngineTemplate instance = (IRazorEngineTemplate) Activator.CreateInstance(this.templateType);
+            IRazorEngineTemplate? instance = (IRazorEngineTemplate?) Activator.CreateInstance(this.templateType);
+            if(instance == null)
+            {
+                throw new OutOfMemoryException($"Failed to create instance of type {this.templateType.Name}");
+            }
+
             instance.Model = model;
 
             await instance.ExecuteAsync();

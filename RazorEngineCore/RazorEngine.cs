@@ -9,7 +9,7 @@ namespace RazorEngineCore
 {
     public class RazorEngine : IRazorEngine
     {
-        public IRazorEngineCompiledTemplate<T> Compile<T>(string content, Action<IRazorEngineCompilationOptionsBuilder> builderAction = null) where T : IRazorEngineTemplate
+        public IRazorEngineCompiledTemplate<T> Compile<T>(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null) where T : IRazorEngineTemplate
         {
             IRazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
 
@@ -23,12 +23,12 @@ namespace RazorEngineCore
             return new RazorEngineCompiledTemplate<T>(memoryStream, compilationOptionsBuilder.Options.TemplateNamespace);
         }
 
-        public Task<IRazorEngineCompiledTemplate<T>> CompileAsync<T>(string content, Action<IRazorEngineCompilationOptionsBuilder> builderAction = null) where T : IRazorEngineTemplate
+        public Task<IRazorEngineCompiledTemplate<T>> CompileAsync<T>(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null) where T : IRazorEngineTemplate
         {
             return Task.Factory.StartNew(() => this.Compile<T>(content: content, builderAction: builderAction));
         }
 
-        public IRazorEngineCompiledTemplate Compile(string content, Action<IRazorEngineCompilationOptionsBuilder> builderAction = null)
+        public IRazorEngineCompiledTemplate Compile(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null)
         {
             IRazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
             compilationOptionsBuilder.Inherits(typeof(RazorEngineTemplateBase));
@@ -40,7 +40,7 @@ namespace RazorEngineCore
             return new RazorEngineCompiledTemplate(memoryStream, compilationOptionsBuilder.Options.TemplateNamespace);
         }
 
-        public Task<IRazorEngineCompiledTemplate> CompileAsync(string content, Action<IRazorEngineCompilationOptionsBuilder> builderAction = null)
+        public Task<IRazorEngineCompiledTemplate> CompileAsync(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null)
         {
             return Task.Factory.StartNew(() => this.Compile(content: content, builderAction: builderAction));
         }

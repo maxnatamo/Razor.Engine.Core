@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-namespace RazorEngineCore
+﻿namespace RazorEngineCore
 {
     public interface IRazorEngineCompiledTemplate
     {
@@ -9,7 +6,7 @@ namespace RazorEngineCore
         Task SaveToStreamAsync(Stream stream);
         void SaveToFile(string fileName);
         Task SaveToFileAsync(string fileName);
-        string Run(object model = null);
-        Task<string> RunAsync(object model = null);
+        string Run(object? model = null);
+        Task<string> RunAsync(object? model = null);
     }
 }
