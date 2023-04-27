@@ -19,7 +19,7 @@ namespace RazorEngineCore
         {
             PropertyInfo propertyInfo = this.model.GetType().GetProperty(binder.Name);
 
-            if (propertyInfo == null)
+            if(propertyInfo == null)
             {
                 result = null;
                 return false;
@@ -27,19 +27,19 @@ namespace RazorEngineCore
 
             result = propertyInfo.GetValue(this.model, null);
 
-            if (result == null)
+            if(result == null)
             {
                 return true;
             }
 
             var type = result.GetType();
 
-            if (result.IsAnonymous())
+            if(result.IsAnonymous())
             {
                 result = new AnonymousTypeWrapper(result);
             }
 
-            if (result is IDictionary dictionary)
+            if(result is IDictionary dictionary)
             {
                 List<object> keys = new List<object>();
 
@@ -50,18 +50,18 @@ namespace RazorEngineCore
 
                 foreach(object key in keys)
                 {
-                    if (dictionary[key].IsAnonymous())
+                    if(dictionary[key].IsAnonymous())
                     {
                         dictionary[key] = new AnonymousTypeWrapper(dictionary[key]);
                     }
                 }
             }
-            else if (result is IEnumerable enumer && !(result is string))
+            else if(result is IEnumerable enumer && !(result is string))
             {
                 result = enumer.Cast<object>()
                         .Select(e =>
                         {
-                            if (e.IsAnonymous())
+                            if(e.IsAnonymous())
                             {
                                 return new AnonymousTypeWrapper(e);
                             }

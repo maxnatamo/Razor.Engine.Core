@@ -22,22 +22,22 @@ namespace RazorEngineCore
         {
             return LoadFromFileAsync(fileName: fileName, templateNamespace: templateNamespace).GetAwaiter().GetResult();
         }
-        
+
         public static async Task<IRazorEngineCompiledTemplate<T>> LoadFromFileAsync(string fileName, string templateNamespace = "TemplateNamespace")
         {
             MemoryStream memoryStream = new MemoryStream();
-            
-            using (FileStream fileStream = new FileStream(
-                path: fileName, 
-                mode: FileMode.Open, 
+
+            using(FileStream fileStream = new FileStream(
+                path: fileName,
+                mode: FileMode.Open,
                 access: FileAccess.Read,
                 share: FileShare.None,
-                bufferSize: 4096, 
+                bufferSize: 4096,
                 useAsync: true))
             {
                 await fileStream.CopyToAsync(memoryStream);
             }
-            
+
             return new RazorEngineCompiledTemplate<T>(memoryStream, templateNamespace);
         }
 
@@ -45,13 +45,13 @@ namespace RazorEngineCore
         {
             return LoadFromStreamAsync(stream).GetAwaiter().GetResult();
         }
-        
+
         public static async Task<IRazorEngineCompiledTemplate<T>> LoadFromStreamAsync(Stream stream, string templateNamespace = "TemplateNamespace")
         {
             MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
-            
+
             return new RazorEngineCompiledTemplate<T>(memoryStream, templateNamespace);
         }
 
@@ -64,20 +64,20 @@ namespace RazorEngineCore
         {
             return this.assemblyByteCode.CopyToAsync(stream);
         }
-        
+
         public void SaveToFile(string fileName)
         {
             this.SaveToFileAsync(fileName).GetAwaiter().GetResult();
         }
-        
+
         public Task SaveToFileAsync(string fileName)
         {
-            using (FileStream fileStream = new FileStream(
-                path: fileName, 
-                mode: FileMode.OpenOrCreate, 
+            using(FileStream fileStream = new FileStream(
+                path: fileName,
+                mode: FileMode.OpenOrCreate,
                 access: FileAccess.Write,
                 share: FileShare.None,
-                bufferSize: 4096, 
+                bufferSize: 4096,
                 useAsync: true))
             {
                 return assemblyByteCode.CopyToAsync(fileStream);
@@ -88,7 +88,7 @@ namespace RazorEngineCore
         {
             return this.RunAsync(initializer).GetAwaiter().GetResult();
         }
-        
+
         public async Task<string> RunAsync(Action<T> initializer)
         {
             T instance = (T) Activator.CreateInstance(this.templateType);

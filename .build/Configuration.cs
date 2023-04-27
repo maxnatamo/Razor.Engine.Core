@@ -10,12 +10,12 @@ public class Configuration : Enumeration
     /// <summary>
     /// Whether the current configuration is set to Debug.
     /// </summary>
-    public bool IsDebug => this.Equals(Debug);
+    public bool IsDebug => Equals(Debug);
 
     /// <summary>
     /// Whether the current configuration is set to Release.
     /// </summary>
-    public bool IsRelease => this.Equals(Release);
+    public bool IsRelease => Equals(Release);
 
     public static implicit operator string(Configuration configuration)
     {

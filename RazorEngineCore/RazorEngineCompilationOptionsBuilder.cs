@@ -30,7 +30,7 @@ namespace RazorEngineCore
         {
             this.AddAssemblyReference(type.Assembly);
 
-            foreach (Type argumentType in type.GenericTypeArguments)
+            foreach(Type argumentType in type.GenericTypeArguments)
             {
                 this.AddAssemblyReference(argumentType);
             }
@@ -63,12 +63,12 @@ namespace RazorEngineCore
 
             string result = string.Join(".", elements.Where(e => !string.IsNullOrWhiteSpace(e)));
 
-            if (result.Contains('`'))
+            if(result.Contains('`'))
             {
                 result = result.Substring(0, result.IndexOf("`"));
             }
 
-            if (type.GenericTypeArguments.Length == 0)
+            if(type.GenericTypeArguments.Length == 0)
             {
                 return result;
             }
@@ -78,14 +78,14 @@ namespace RazorEngineCore
 
         private string RenderDeclaringType(Type type)
         {
-            if (type == null)
+            if(type == null)
             {
                 return null;
             }
 
             string parent = RenderDeclaringType(type.DeclaringType);
 
-            if (string.IsNullOrWhiteSpace(parent))
+            if(string.IsNullOrWhiteSpace(parent))
             {
                 return type.Name;
             }

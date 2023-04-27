@@ -7,7 +7,7 @@ namespace RazorEngineCore
     public interface IRazorEngineCompilationOptionsBuilder
     {
         RazorEngineCompilationOptions Options { get; set; }
-        
+
         void AddAssemblyReferenceByName(string assemblyName);
         void AddAssemblyReference(Assembly assembly);
         void AddAssemblyReference(Type type);

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Reflection.Metadata;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
-using System.Reflection.Metadata;
 
 namespace RazorEngineCore
 {
@@ -91,7 +86,7 @@ namespace RazorEngineCore
                        unsafe
                        {
                            ass.TryGetRawMetadata(out byte* blob, out int length);
-                           ModuleMetadata moduleMetadata = ModuleMetadata.CreateFromMetadata((IntPtr)blob, length);
+                           ModuleMetadata moduleMetadata = ModuleMetadata.CreateFromMetadata((IntPtr) blob, length);
                            AssemblyMetadata assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
                            PortableExecutableReference metadataReference = assemblyMetadata.GetReference();
 
@@ -107,7 +102,7 @@ namespace RazorEngineCore
 
             EmitResult emitResult = compilation.Emit(memoryStream);
 
-            if (!emitResult.Success)
+            if(!emitResult.Success)
             {
                 RazorEngineCompilationException exception = new RazorEngineCompilationException()
                 {
@@ -128,7 +123,7 @@ namespace RazorEngineCore
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"@inherits {options.Inherits}");
 
-            foreach (string entry in options.DefaultUsings)
+            foreach(string entry in options.DefaultUsings)
             {
                 stringBuilder.AppendLine($"@using {entry}");
             }

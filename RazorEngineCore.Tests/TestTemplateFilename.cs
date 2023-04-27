@@ -10,7 +10,7 @@
 
             // Act
             Action act = () => razorEngine.Compile(
-                "@{ this is a syntaxerror }", 
+                "@{ this is a syntaxerror }",
                 builder =>
                 {
                     builder.Options.TemplateFilename = "templatefilenameset.txt";

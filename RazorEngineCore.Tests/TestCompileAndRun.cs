@@ -386,7 +386,7 @@ void RecursionTest(int level)
 @inherits RazorEngineCore.RazorEngineTemplateBase<RazorEngineCore.Tests.Models.TestModel>
 Hello @Model.Decorator(Model.C)
 ";
-            
+
             var template = new RazorEngine().Compile<RazorEngineTemplateBase<TestModel>>(templateText);
 
             // Act
@@ -484,7 +484,7 @@ Hello @Model.Decorator(Model.C)
             // Act
             string actual = template.Run(new
             {
-                    Numbers = new List<object>() {2, 1, 3}
+                Numbers = new List<object>() { 2, 1, 3 }
             });
 
             // Assert
@@ -527,7 +527,7 @@ namespace TestAssembly
             MemoryStream memoryStream = new MemoryStream();
             EmitResult emitResult = compilation.Emit(memoryStream);
 
-            if (!emitResult.Success)
+            if(!emitResult.Success)
             {
                 Assert.Fail("Unable to compile test assembly");
             }
@@ -558,7 +558,7 @@ namespace TestAssembly
 
         private static List<MetadataReference> GetMetadataReferences()
         {
-            if (RuntimeInformation.FrameworkDescription.StartsWith(
+            if(RuntimeInformation.FrameworkDescription.StartsWith(
                 ".NET Framework",
                 StringComparison.OrdinalIgnoreCase))
             {

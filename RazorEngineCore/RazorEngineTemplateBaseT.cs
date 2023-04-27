@@ -4,4 +4,4 @@
     {
         public new T Model { get; set; }
     }
-}   
+}

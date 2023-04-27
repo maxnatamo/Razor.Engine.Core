@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
-using System;
 
 namespace RazorEngineCore
 {
@@ -27,7 +25,7 @@ namespace RazorEngineCore
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             bool isFullFramework = RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 
-            if (isWindows && isFullFramework)
+            if(isWindows && isFullFramework)
             {
                 this.ReferencedAssemblies = new HashSet<Assembly>()
                 {
@@ -43,7 +41,7 @@ namespace RazorEngineCore
                 };
             }
 
-            if (isWindows && !isFullFramework) // i.e. NETCore
+            if(isWindows && !isFullFramework) // i.e. NETCore
             {
                 this.ReferencedAssemblies = new HashSet<Assembly>()
                 {
@@ -59,7 +57,7 @@ namespace RazorEngineCore
                 };
             }
 
-            if (!isWindows)
+            if(!isWindows)
             {
                 this.ReferencedAssemblies = new HashSet<Assembly>()
                 {
