@@ -7,7 +7,7 @@ namespace RazorEngineCore
         public new T Model { get; set; } = default(T)!;
     }
 
-    public abstract class RazorEngineTemplateBase : IRazorEngineTemplate
+    public abstract class RazorEngineTemplateBase
     {
         private readonly StringBuilder stringBuilder = new StringBuilder();
 

@@ -2,7 +2,7 @@
 
 namespace RazorEngineCore
 {
-    public class RazorEngineCompiledTemplate<T> : IRazorEngineCompiledTemplate<T> where T : IRazorEngineTemplate
+    public class RazorEngineCompiledTemplate<T> where T : RazorEngineTemplateBase
     {
         protected MemoryStream assemblyByteCode { get; set; }
         protected Type templateType { get; set; }
@@ -15,12 +15,12 @@ namespace RazorEngineCore
             this.templateType = assembly.GetType($"{templateNamespace}.Template") ?? throw new InvalidDataException();
         }
 
-        public static IRazorEngineCompiledTemplate<T> LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
+        public static RazorEngineCompiledTemplate<T> LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
         {
             return LoadFromFileAsync(fileName: fileName, templateNamespace: templateNamespace).GetAwaiter().GetResult();
         }
 
-        public static async Task<IRazorEngineCompiledTemplate<T>> LoadFromFileAsync(string fileName, string templateNamespace = "TemplateNamespace")
+        public static async Task<RazorEngineCompiledTemplate<T>> LoadFromFileAsync(string fileName, string templateNamespace = "TemplateNamespace")
         {
             MemoryStream memoryStream = new MemoryStream();
 
@@ -38,12 +38,12 @@ namespace RazorEngineCore
             return new RazorEngineCompiledTemplate<T>(memoryStream, templateNamespace);
         }
 
-        public static IRazorEngineCompiledTemplate<T> LoadFromStream(Stream stream)
+        public static RazorEngineCompiledTemplate<T> LoadFromStream(Stream stream)
         {
             return LoadFromStreamAsync(stream).GetAwaiter().GetResult();
         }
 
-        public static async Task<IRazorEngineCompiledTemplate<T>> LoadFromStreamAsync(Stream stream, string templateNamespace = "TemplateNamespace")
+        public static async Task<RazorEngineCompiledTemplate<T>> LoadFromStreamAsync(Stream stream, string templateNamespace = "TemplateNamespace")
         {
             MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);

@@ -40,7 +40,7 @@ namespace RazorEngineCore.Tests
         public void Compile_Returns_GivenHtmlLiteral()
         {
             // Arrange
-            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<h1>Hello @Model.Name</h1>");
+            RazorEngineCompiledTemplate template = new RazorEngine().Compile("<h1>Hello @Model.Name</h1>");
 
             // Act
             string actual = template.Run(new { Name = "Alex" });
@@ -54,7 +54,7 @@ namespace RazorEngineCore.Tests
         {
             // Arrange
             string content = "<div class=\"circle\" style=\"background-color: hsla(@Model.Colour, 70%,   80%,1);\">";
-            IRazorEngineCompiledTemplate template = new RazorEngine().Compile(content);
+            RazorEngineCompiledTemplate template = new RazorEngine().Compile(content);
 
             // Act
             string actual = template.Run(new { Colour = 88 });
@@ -67,7 +67,7 @@ namespace RazorEngineCore.Tests
         public void Compile_Returns_GivenInAttributeVariables2()
         {
             // Arrange
-            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<img src='@(\"test\")'>");
+            RazorEngineCompiledTemplate template = new RazorEngine().Compile("<img src='@(\"test\")'>");
 
             // Act
             string actual = template.Run(new { Colour = 88 });
@@ -80,7 +80,7 @@ namespace RazorEngineCore.Tests
         public void Compile_Returns_GivenHtmlAttribute()
         {
             // Arrange
-            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("<div title=\"@Model.Name\">Hello</div>");
+            RazorEngineCompiledTemplate template = new RazorEngine().Compile("<div title=\"@Model.Name\">Hello</div>");
 
             // Act
             string actual = template.Run(new { Name = "Alex" });
@@ -93,7 +93,7 @@ namespace RazorEngineCore.Tests
         public void Compile_Returns_GivenPlainDynamicModel()
         {
             // Assert
-            IRazorEngineCompiledTemplate template = new RazorEngine().Compile("Hello @Model.Name");
+            RazorEngineCompiledTemplate template = new RazorEngine().Compile("Hello @Model.Name");
 
             // Act
             string actual = template.Run(new { Name = "Alex" });

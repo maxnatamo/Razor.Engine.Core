@@ -2,7 +2,7 @@
 
 namespace RazorEngineCore
 {
-    public class RazorEngineCompiledTemplate : IRazorEngineCompiledTemplate
+    public class RazorEngineCompiledTemplate
     {
         private readonly MemoryStream assemblyByteCode;
         private readonly Type templateType;
@@ -15,12 +15,12 @@ namespace RazorEngineCore
             this.templateType = assembly.GetType(templateNamespace + ".Template") ?? throw new InvalidDataException();
         }
 
-        public static IRazorEngineCompiledTemplate LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
+        public static RazorEngineCompiledTemplate LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
         {
             return LoadFromFileAsync(fileName, templateNamespace).GetAwaiter().GetResult();
         }
 
-        public static async Task<IRazorEngineCompiledTemplate> LoadFromFileAsync(string fileName, string templateNamespace = "TemplateNamespace")
+        public static async Task<RazorEngineCompiledTemplate> LoadFromFileAsync(string fileName, string templateNamespace = "TemplateNamespace")
         {
             MemoryStream memoryStream = new MemoryStream();
 
@@ -38,12 +38,12 @@ namespace RazorEngineCore
             return new RazorEngineCompiledTemplate(memoryStream, templateNamespace);
         }
 
-        public static IRazorEngineCompiledTemplate LoadFromStream(Stream stream)
+        public static RazorEngineCompiledTemplate LoadFromStream(Stream stream)
         {
             return LoadFromStreamAsync(stream).GetAwaiter().GetResult();
         }
 
-        public static async Task<IRazorEngineCompiledTemplate> LoadFromStreamAsync(Stream stream, string templateNamespace = "TemplateNamespace")
+        public static async Task<RazorEngineCompiledTemplate> LoadFromStreamAsync(Stream stream, string templateNamespace = "TemplateNamespace")
         {
             MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
@@ -101,7 +101,7 @@ namespace RazorEngineCore
                 model = new AnonymousTypeWrapper(model);
             }
 
-            IRazorEngineTemplate? instance = (IRazorEngineTemplate?) Activator.CreateInstance(this.templateType);
+            RazorEngineTemplateBase? instance = (RazorEngineTemplateBase?) Activator.CreateInstance(this.templateType);
             if(instance == null)
             {
                 throw new OutOfMemoryException($"Failed to create instance of type {this.templateType.Name}");

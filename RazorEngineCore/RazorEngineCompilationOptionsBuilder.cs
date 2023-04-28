@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace RazorEngineCore
 {
-    public class RazorEngineCompilationOptionsBuilder : IRazorEngineCompilationOptionsBuilder
+    public class RazorEngineCompilationOptionsBuilder
     {
         public RazorEngineCompilationOptions Options { get; set; }
 

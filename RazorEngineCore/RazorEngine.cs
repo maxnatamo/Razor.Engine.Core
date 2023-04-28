@@ -7,11 +7,11 @@ using Microsoft.CodeAnalysis.Emit;
 
 namespace RazorEngineCore
 {
-    public class RazorEngine : IRazorEngine
+    public class RazorEngine
     {
-        public IRazorEngineCompiledTemplate<T> Compile<T>(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null) where T : IRazorEngineTemplate
+        public RazorEngineCompiledTemplate<T> Compile<T>(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null) where T : RazorEngineTemplateBase
         {
-            IRazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
+            RazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
 
             compilationOptionsBuilder.AddAssemblyReference(typeof(T).Assembly);
             compilationOptionsBuilder.Inherits(typeof(T));
@@ -23,14 +23,14 @@ namespace RazorEngineCore
             return new RazorEngineCompiledTemplate<T>(memoryStream, compilationOptionsBuilder.Options.TemplateNamespace);
         }
 
-        public Task<IRazorEngineCompiledTemplate<T>> CompileAsync<T>(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null) where T : IRazorEngineTemplate
+        public Task<RazorEngineCompiledTemplate<T>> CompileAsync<T>(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null) where T : RazorEngineTemplateBase
         {
             return Task.Factory.StartNew(() => this.Compile<T>(content: content, builderAction: builderAction));
         }
 
-        public IRazorEngineCompiledTemplate Compile(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null)
+        public RazorEngineCompiledTemplate Compile(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null)
         {
-            IRazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
+            RazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
             compilationOptionsBuilder.Inherits(typeof(RazorEngineTemplateBase));
 
             builderAction?.Invoke(compilationOptionsBuilder);
@@ -40,7 +40,7 @@ namespace RazorEngineCore
             return new RazorEngineCompiledTemplate(memoryStream, compilationOptionsBuilder.Options.TemplateNamespace);
         }
 
-        public Task<IRazorEngineCompiledTemplate> CompileAsync(string content, Action<IRazorEngineCompilationOptionsBuilder>? builderAction = null)
+        public Task<RazorEngineCompiledTemplate> CompileAsync(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null)
         {
             return Task.Factory.StartNew(() => this.Compile(content: content, builderAction: builderAction));
         }
@@ -80,9 +80,6 @@ namespace RazorEngineCore
                 options.ReferencedAssemblies
                    .Select(ass =>
                    {
-#if NETSTANDARD2_0
-                            return  MetadataReference.CreateFromFile(ass.Location); 
-#else
                        unsafe
                        {
                            ass.TryGetRawMetadata(out byte* blob, out int length);
@@ -92,7 +89,6 @@ namespace RazorEngineCore
 
                            return metadataReference;
                        }
-#endif
                    })
                     .Concat(options.MetadataReferences)
                     .ToList(),

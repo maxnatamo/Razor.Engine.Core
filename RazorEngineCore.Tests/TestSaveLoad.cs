@@ -8,7 +8,7 @@
             // Arrange
             var initialTemplate = new RazorEngine().Compile("Hello @Model.Name");
 
-            MemoryStream memoryStream = new MemoryStream();
+            using MemoryStream memoryStream = new MemoryStream();
             initialTemplate.SaveToStream(memoryStream);
             memoryStream.Position = 0;
 
@@ -28,7 +28,7 @@
             // Arrange
             var initialTemplate = await new RazorEngine().CompileAsync("Hello @Model.Name");
 
-            MemoryStream memoryStream = new MemoryStream();
+            using MemoryStream memoryStream = new MemoryStream();
             await initialTemplate.SaveToStreamAsync(memoryStream);
             memoryStream.Position = 0;
 
