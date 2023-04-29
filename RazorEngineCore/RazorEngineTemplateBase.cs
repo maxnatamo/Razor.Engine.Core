@@ -27,7 +27,7 @@ namespace RazorEngineCore
         /// <summary>
         /// Optional model for the template.
         /// </summary>
-        public dynamic Model { get; set; } = default!;
+        public dynamic? Model { get; set; } = null;
 
         /// <summary>
         /// Write the specified <paramref name="value" /> to the template with HTML encoding.
