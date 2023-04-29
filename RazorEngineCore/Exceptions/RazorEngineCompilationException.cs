@@ -3,9 +3,9 @@ using Microsoft.CodeAnalysis;
 
 namespace RazorEngineCore
 {
+    [Serializable]
     public class RazorEngineCompilationException : RazorEngineException
     {
-
         public List<Diagnostic> Errors { get; set; } = new List<Diagnostic>();
 
         public string GeneratedCode { get; set; } = string.Empty;
@@ -15,7 +15,7 @@ namespace RazorEngineCore
             get
             {
                 string errors = string.Join("\n", this.Errors.Where(w => w.IsWarningAsError || w.Severity == DiagnosticSeverity.Error));
-                return "Unable to compile template: " + errors;
+                return "Unable to compile template:\n" + errors;
             }
         }
 

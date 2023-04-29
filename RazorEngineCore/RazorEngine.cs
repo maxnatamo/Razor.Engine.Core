@@ -7,44 +7,81 @@ using Microsoft.CodeAnalysis.Emit;
 
 namespace RazorEngineCore
 {
+    /// <summary>
+    /// Engine for compiling and executing Razor templates.
+    /// </summary>
     public class RazorEngine
     {
-        public RazorEngineCompiledTemplate<T> Compile<T>(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null) where T : RazorEngineTemplateBase
+        /// <summary>
+        /// Compile the specified <paramref name="content" /> as a Razor template and return it.
+        /// </summary>
+        /// <param name="content">The Razor template content to compile.</param>
+        /// <param name="builderAction">Action for defining options for the compilation.</param>
+        /// <typeparam name="T">The base type for the template.</typeparam>
+        /// <returns>The compiled <see cref="RazorEngineCompiledTemplate" /> template instance.</returns>
+        /// <exception cref="RazorEngineCompilationException">Thrown if compilation of the template source code failed.<exception>
+        public RazorEngineCompiledTemplate<T> Compile<T>(string content, Action<RazorEngineCompilationOptions>? builderAction = null) where T : RazorEngineTemplateBase
         {
-            RazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
+            RazorEngineCompilationOptions compilationOptions = new RazorEngineCompilationOptions();
+            compilationOptions.SetInherits(typeof(T));
 
-            compilationOptionsBuilder.AddAssemblyReference(typeof(T).Assembly);
-            compilationOptionsBuilder.Inherits(typeof(T));
+            builderAction?.Invoke(compilationOptions);
 
-            builderAction?.Invoke(compilationOptionsBuilder);
-
-            MemoryStream memoryStream = this.CreateAndCompileToStream(content, compilationOptionsBuilder.Options);
-
-            return new RazorEngineCompiledTemplate<T>(memoryStream, compilationOptionsBuilder.Options.TemplateNamespace);
+            MemoryStream memoryStream = this.CreateAndCompileToStream(content, compilationOptions);
+            return new RazorEngineCompiledTemplate<T>(memoryStream, compilationOptions.TemplateNamespace);
         }
 
-        public Task<RazorEngineCompiledTemplate<T>> CompileAsync<T>(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null) where T : RazorEngineTemplateBase
+        /// <summary>
+        /// Compile the specified <paramref name="content" /> as a Razor template and return it, asynchronously.
+        /// </summary>
+        /// <param name="content">The Razor template content to compile.</param>
+        /// <param name="builderAction">Action for defining options for the compilation.</param>
+        /// <typeparam name="T">The base type for the template.</typeparam>
+        /// <returns>The compiled <see cref="RazorEngineCompiledTemplate" /> template instance.</returns>
+        /// <exception cref="RazorEngineCompilationException">Thrown if compilation of the template source code failed.<exception>
+        public async Task<RazorEngineCompiledTemplate<T>> CompileAsync<T>(string content, Action<RazorEngineCompilationOptions>? builderAction = null) where T : RazorEngineTemplateBase
         {
-            return Task.Factory.StartNew(() => this.Compile<T>(content: content, builderAction: builderAction));
+            return await Task.Run(() => this.Compile<T>(content: content, builderAction: builderAction));
         }
 
-        public RazorEngineCompiledTemplate Compile(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null)
+        /// <summary>
+        /// Compile the specified <paramref name="content" /> as a Razor template and return it.
+        /// </summary>
+        /// <param name="content">The Razor template content to compile.</param>
+        /// <param name="builderAction">Action for defining options for the compilation.</param>
+        /// <returns>The compiled <see cref="RazorEngineCompiledTemplate" /> template instance.</returns>
+        /// <exception cref="RazorEngineCompilationException">Thrown if compilation of the template source code failed.<exception>
+        public RazorEngineCompiledTemplate Compile(string content, Action<RazorEngineCompilationOptions>? builderAction = null)
         {
-            RazorEngineCompilationOptionsBuilder compilationOptionsBuilder = new RazorEngineCompilationOptionsBuilder();
-            compilationOptionsBuilder.Inherits(typeof(RazorEngineTemplateBase));
+            RazorEngineCompilationOptions compilationOptions = new RazorEngineCompilationOptions();
+            compilationOptions.SetInherits(typeof(RazorEngineTemplateBase));
 
-            builderAction?.Invoke(compilationOptionsBuilder);
+            builderAction?.Invoke(compilationOptions);
 
-            MemoryStream memoryStream = this.CreateAndCompileToStream(content, compilationOptionsBuilder.Options);
-
-            return new RazorEngineCompiledTemplate(memoryStream, compilationOptionsBuilder.Options.TemplateNamespace);
+            MemoryStream memoryStream = this.CreateAndCompileToStream(content, compilationOptions);
+            return new RazorEngineCompiledTemplate(memoryStream, compilationOptions.TemplateTypeFullName);
         }
 
-        public Task<RazorEngineCompiledTemplate> CompileAsync(string content, Action<RazorEngineCompilationOptionsBuilder>? builderAction = null)
+
+        /// <summary>
+        /// Compile the specified <paramref name="content" /> as a Razor template and return it, asynchronously.
+        /// </summary>
+        /// <param name="content">The Razor template content to compile.</param>
+        /// <param name="builderAction">Action for defining options for the compilation.</param>
+        /// <returns>The compiled <see cref="RazorEngineCompiledTemplate" /> template instance.</returns>
+        /// <exception cref="RazorEngineCompilationException">Thrown if compilation of the template source code failed.<exception>
+        public async Task<RazorEngineCompiledTemplate> CompileAsync(string content, Action<RazorEngineCompilationOptions>? builderAction = null)
         {
-            return Task.Factory.StartNew(() => this.Compile(content: content, builderAction: builderAction));
+            return await Task.Run(() => this.Compile(content: content, builderAction: builderAction));
         }
 
+        /// <summary>
+        /// Compile the specified <paramref name="templateSource" /> source code into an assembly, containing the resulting template type.
+        /// </summary>
+        /// <param name="templateSource">The Razor template content to compile.</param>
+        /// <param name="options">Action for defining options for the compilation.</param>s
+        /// <returns>A <see cref="MemoryStream" />-instance, containing the resulting assembly.</returns>
+        /// <exception cref="RazorEngineCompilationException">Thrown if compilation of the template source code failed.<exception>
         protected virtual MemoryStream CreateAndCompileToStream(string templateSource, RazorEngineCompilationOptions options)
         {
             templateSource = this.WriteDirectives(templateSource, options);
@@ -60,7 +97,6 @@ namespace RazorEngineCore
             string fileName = string.IsNullOrWhiteSpace(options.TemplateFilename) ? Path.GetRandomFileName() : options.TemplateFilename;
 
             RazorSourceDocument document = RazorSourceDocument.Create(templateSource, fileName);
-
             RazorCodeDocument codeDocument = engine.Process(
                 document,
                 null,
@@ -68,21 +104,21 @@ namespace RazorEngineCore
                 new List<TagHelperDescriptor>());
 
             RazorCSharpDocument razorCSharpDocument = codeDocument.GetCSharpDocument();
-
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(razorCSharpDocument.GeneratedCode);
 
             CSharpCompilation compilation = CSharpCompilation.Create(
-                fileName,
-                new[]
+                assemblyName: fileName,
+                syntaxTrees: new[]
                 {
                     syntaxTree
                 },
-                options.ReferencedAssemblies
-                   .Select(ass =>
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                references: options.ReferencedAssemblies
+                   .Select(assembly =>
                    {
                        unsafe
                        {
-                           ass.TryGetRawMetadata(out byte* blob, out int length);
+                           assembly.TryGetRawMetadata(out byte* blob, out int length);
                            ModuleMetadata moduleMetadata = ModuleMetadata.CreateFromMetadata((IntPtr) blob, length);
                            AssemblyMetadata assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
                            PortableExecutableReference metadataReference = assemblyMetadata.GetReference();
@@ -90,23 +126,18 @@ namespace RazorEngineCore
                            return metadataReference;
                        }
                    })
-                    .Concat(options.MetadataReferences)
-                    .ToList(),
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                   .Concat(options.MetadataReferences).ToList());
 
             MemoryStream memoryStream = new MemoryStream();
-
             EmitResult emitResult = compilation.Emit(memoryStream);
 
             if(!emitResult.Success)
             {
-                RazorEngineCompilationException exception = new RazorEngineCompilationException()
+                throw new RazorEngineCompilationException()
                 {
                     Errors = emitResult.Diagnostics.ToList(),
                     GeneratedCode = razorCSharpDocument.GeneratedCode
                 };
-
-                throw exception;
             }
 
             memoryStream.Position = 0;
@@ -114,6 +145,12 @@ namespace RazorEngineCore
             return memoryStream;
         }
 
+        /// <summary>
+        /// Prepends the directives defined in <paramref name="options" /> to <paramref name="content" /> and returns it.
+        /// </summary>
+        /// <param name="content">The content of the Razor template.</param>
+        /// <param name="options">The <see cref="RazorEngineCompilationOptions" />-instance, containing the directives.</param>
+        /// <returns>The content with directives added.</returns>
         protected virtual string WriteDirectives(string content, RazorEngineCompilationOptions options)
         {
             StringBuilder stringBuilder = new StringBuilder();

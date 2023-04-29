@@ -57,9 +57,9 @@ namespace RazorEngineCore
             this.SaveToStreamAsync(stream).GetAwaiter().GetResult();
         }
 
-        public Task SaveToStreamAsync(Stream stream)
+        public async Task SaveToStreamAsync(Stream stream)
         {
-            return this.assemblyByteCode.CopyToAsync(stream);
+            await this.assemblyByteCode.CopyToAsync(stream);
         }
 
         public void SaveToFile(string fileName)
@@ -67,7 +67,7 @@ namespace RazorEngineCore
             this.SaveToFileAsync(fileName).GetAwaiter().GetResult();
         }
 
-        public Task SaveToFileAsync(string fileName)
+        public async Task SaveToFileAsync(string fileName)
         {
             using(FileStream fileStream = new FileStream(
                 path: fileName,
@@ -77,7 +77,7 @@ namespace RazorEngineCore
                 bufferSize: 4096,
                 useAsync: true))
             {
-                return assemblyByteCode.CopyToAsync(fileStream);
+                await assemblyByteCode.CopyToAsync(fileStream);
             }
         }
 
@@ -98,7 +98,8 @@ namespace RazorEngineCore
             initializer(instance);
 
             await instance.ExecuteAsync();
-            return await instance.ResultAsync();
+
+            return instance.Result();
         }
     }
 }

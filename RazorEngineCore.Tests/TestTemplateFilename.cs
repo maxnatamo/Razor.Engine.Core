@@ -11,9 +11,9 @@
             // Act
             Action act = () => razorEngine.Compile(
                 "@{ this is a syntaxerror }",
-                builder =>
+                options =>
                 {
-                    builder.Options.TemplateFilename = "templatefilenameset.txt";
+                    options.TemplateFilename = "templatefilenameset.txt";
                 });
 
             // Assert

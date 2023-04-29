@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
+using System.Web;
 
 namespace RazorEngineCore
 {
@@ -7,92 +9,159 @@ namespace RazorEngineCore
         public new T Model { get; set; } = default(T)!;
     }
 
+    /// <summary>
+    /// Template for all compiled Razor views.
+    /// </summary>
     public abstract class RazorEngineTemplateBase
     {
-        private readonly StringBuilder stringBuilder = new StringBuilder();
+        /// <summary>
+        /// Content of the template. This is only populated when running <see cref="ExecuteAsync" />.
+        /// </summary>
+        private readonly StringBuilder TemplateContents = new StringBuilder();
 
-        private string attributeSuffix = string.Empty;
+        /// <summary>
+        /// Suffix for the current attribute context.
+        /// </summary>
+        private string AttributeSuffix = string.Empty;
 
+        /// <summary>
+        /// Optional model for the template.
+        /// </summary>
         public dynamic Model { get; set; } = default!;
 
-        public void WriteLiteral(string? literal = null)
+        /// <summary>
+        /// Write the specified <paramref name="value" /> to the template with HTML encoding.
+        /// </summary>
+        /// <param name="value">The <see cref="string" /> value to write.</param>
+        public void Write(string? value)
         {
-            WriteLiteralAsync(literal).GetAwaiter().GetResult();
+            if(!string.IsNullOrEmpty(value))
+            {
+                value = this.HtmlEncode(value);
+                this.TemplateContents.Append(value);
+            }
         }
 
-        public virtual Task WriteLiteralAsync(string? literal = null)
+        /// <summary>
+        /// Write the specified <paramref name="value" /> to the template with HTML encoding.
+        /// </summary>
+        /// <param name="value">The <see cref="object" /> value to write.</param>
+        public void Write(object? value = null)
         {
-            this.stringBuilder.Append(literal);
-            return Task.CompletedTask;
+            if(value is null)
+            {
+                return;
+            }
+
+            this.Write(value.ToString());
         }
 
-        public void Write(object? obj = null)
+        /// <summary>
+        /// Write the specified <paramref name="value" /> to the template, without any conversion and/or encoding.
+        /// </summary>
+        /// <param name="value">The <see cref="string" /> value to write.</param>
+        public void WriteLiteral(string? value)
         {
-            WriteAsync(obj).GetAwaiter().GetResult();
+            if(!string.IsNullOrEmpty(value))
+            {
+                this.TemplateContents.Append(value);
+            }
         }
 
-        public virtual Task WriteAsync(object? obj = null)
+        /// <summary>
+        /// Write the specified <paramref name="value" /> to the template, without any conversion and/or encoding.
+        /// </summary>
+        /// <param name="value">The <see cref="object" /> value to write.</param>
+        public void WriteLiteral(object? value)
         {
-            this.stringBuilder.Append(obj);
-            return Task.CompletedTask;
+            if(value is null)
+            {
+                return;
+            }
+
+            this.WriteLiteral(value.ToString());
         }
 
-        public void BeginWriteAttribute(string name, string prefix, int prefixOffset, string suffix, int suffixOffset,
+        /// <summary>
+        /// Begins writing out an attribute.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="prefix">The prefix.</param>
+        /// <param name="prefixOffset">The prefix offset.</param>
+        /// <param name="suffix">The suffix.</param>
+        /// <param name="suffixOffset">The suffix offset.</param>
+        /// <param name="attributeValuesCount">The attribute values count.</param>
+        public void BeginWriteAttribute(
+            string name,
+            string prefix,
+            int prefixOffset,
+            string suffix,
+            int suffixOffset,
             int attributeValuesCount)
         {
-            BeginWriteAttributeAsync(name, prefix, prefixOffset, suffix, suffixOffset, attributeValuesCount).GetAwaiter().GetResult();
+            ArgumentNullException.ThrowIfNull(prefix);
+            ArgumentNullException.ThrowIfNull(suffix);
+
+            this.AttributeSuffix = suffix;
+            this.TemplateContents.Append(prefix);
         }
 
-        public virtual Task BeginWriteAttributeAsync(string name, string prefix, int prefixOffset, string suffix, int suffixOffset, int attributeValuesCount)
-        {
-            this.attributeSuffix = suffix;
-            this.stringBuilder.Append(prefix);
-            return Task.CompletedTask;
-        }
-
-        public void WriteAttributeValue(string prefix, int prefixOffset, object value, int valueOffset, int valueLength,
+        /// <summary>
+        /// Writes out an attribute value.
+        /// </summary>
+        /// <param name="prefix">The prefix.</param>
+        /// <param name="prefixOffset">The prefix offset.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="valueOffset">The value offset.</param>
+        /// <param name="valueLength">The value length.</param>
+        /// <param name="isLiteral">Whether the attribute is a literal.</param>
+        public void WriteAttributeValue(
+            string prefix,
+            int prefixOffset,
+            object value,
+            int valueOffset,
+            int valueLength,
             bool isLiteral)
         {
-            WriteAttributeValueAsync(prefix, prefixOffset, value, valueOffset, valueLength, isLiteral).GetAwaiter().GetResult();
+            this.TemplateContents.Append(prefix);
+            this.TemplateContents.Append(value);
         }
 
-        public virtual Task WriteAttributeValueAsync(string prefix, int prefixOffset, object value, int valueOffset, int valueLength, bool isLiteral)
-        {
-            this.stringBuilder.Append(prefix);
-            this.stringBuilder.Append(value);
-            return Task.CompletedTask;
-        }
-
+        /// <summary>
+        /// Ends writing an attribute.
+        /// </summary>
         public void EndWriteAttribute()
         {
-            EndWriteAttributeAsync().GetAwaiter().GetResult();
+            this.TemplateContents.Append(this.AttributeSuffix);
+            this.AttributeSuffix = string.Empty;
         }
 
-        public virtual Task EndWriteAttributeAsync()
-        {
-            this.stringBuilder.Append(this.attributeSuffix);
-            this.attributeSuffix = string.Empty;
-            return Task.CompletedTask;
-        }
+        /// <summary>
+        /// Renders the page and writes the output to the <see cref="RazorEngineTemplateBase.TemplateContents" />.
+        /// </summary>
+        /// <returns>A <see cref="Task" /> representing the result of executing the page.</returns>
+        public virtual async Task ExecuteAsync()
+            => await Task.CompletedTask;
 
-        public void Execute()
-        {
-            ExecuteAsync().GetAwaiter().GetResult();
-        }
-
-        public virtual Task ExecuteAsync()
-        {
-            return Task.CompletedTask;
-        }
-
+        /// <summary>
+        /// Get the generated contents of the template.
+        /// </summary>
         public virtual string Result()
-        {
-            return ResultAsync().GetAwaiter().GetResult();
-        }
+            => this.TemplateContents.ToString();
 
-        public virtual Task<string> ResultAsync()
+        /// <summary>
+        /// Encode the specified object using HTML entities.
+        /// </summary>
+        /// <param name="value">The value to encode.</param>
+        /// <returns>The HTML encoded value as a <see cref="string" />.</returns>
+        private string? HtmlEncode(object? value)
         {
-            return Task.FromResult<string>(this.stringBuilder.ToString());
+            if(value == null)
+            {
+                return string.Empty;
+            }
+
+            return HttpUtility.HtmlEncode(Convert.ToString(value, CultureInfo.InvariantCulture));
         }
     }
 }

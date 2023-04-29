@@ -2,98 +2,163 @@
 
 namespace RazorEngineCore
 {
+    /// <summary>
+    /// Representation of a compiled Razor template assembly.
+    /// </summary>
     public class RazorEngineCompiledTemplate
     {
-        private readonly MemoryStream assemblyByteCode;
-        private readonly Type templateType;
+        /// <summary>
+        /// <see cref="MemoryStream" />-instance containing the binary code for the compiled assembly.
+        /// </summary>
+        private readonly MemoryStream AssemblyByteCode;
 
-        internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateNamespace)
+        /// <summary>
+        /// The <see cref="Type" /> of the compiled template.
+        /// </summary>
+        private readonly Type TemplateType;
+
+        /// <summary>
+        /// Initialize a new <see cref="RazorEngineCompiledTemplate" />-instance.
+        /// </summary>
+        /// <param name="assemblyByteCode"><see cref="MemoryStream" />-instance containing the binary code for the compiled assembly.</param>
+        /// <param name="templateName">The full name of the compiled template, including namespace.</param>
+        /// <exception cref="BadImageFormatException">Thrown if <paramref name="assemblyByteCode" /> doesn't contain valid assembly byte code.</exception>
+        /// <exception cref="InvalidDataException">
+        /// Thrown if the passed assembly code doesn't contain a type, with the name of <paramref name="templateName" />.
+        /// </exception>
+        internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateName)
         {
-            this.assemblyByteCode = assemblyByteCode;
+            this.AssemblyByteCode = assemblyByteCode;
 
             Assembly assembly = Assembly.Load(assemblyByteCode.ToArray());
-            this.templateType = assembly.GetType(templateNamespace + ".Template") ?? throw new InvalidDataException();
+            this.TemplateType = assembly.GetType(templateName) ?? throw new InvalidDataException($"Template type not found: {templateName}");
         }
 
-        public static RazorEngineCompiledTemplate LoadFromFile(string fileName, string templateNamespace = "TemplateNamespace")
-        {
-            return LoadFromFileAsync(fileName, templateNamespace).GetAwaiter().GetResult();
-        }
-
-        public static async Task<RazorEngineCompiledTemplate> LoadFromFileAsync(string fileName, string templateNamespace = "TemplateNamespace")
+        /// <summary>
+        /// Loads a compiled Razor template from a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file containing the compiled Razor template.</param>
+        /// <param name="templateName">The name of the template type in the assembly.</param>
+        /// <returns>A read <see cref="RazorEngineCompiledTemplate" />-instance.</returns>
+        public static RazorEngineCompiledTemplate LoadFromFile(string filePath, string templateName)
         {
             MemoryStream memoryStream = new MemoryStream();
 
-            using(FileStream fileStream = new FileStream(
-                path: fileName,
-                mode: FileMode.Open,
-                access: FileAccess.Read,
-                share: FileShare.None,
-                bufferSize: 4096,
-                useAsync: true))
+            using(FileStream fileStream = new FileStream(path: filePath, mode: FileMode.Open))
+            {
+                fileStream.CopyTo(memoryStream);
+            }
+
+            return new RazorEngineCompiledTemplate(memoryStream, templateName);
+        }
+
+        /// <summary>
+        /// Loads a compiled Razor template from a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file containing the compiled Razor template.</param>
+        /// <param name="templateName">The name of the template type in the assembly.</param>
+        /// <returns>A <see cref="Task" />, resolving to the read <see cref="RazorEngineCompiledTemplate" />-instance.</returns>
+        public static async Task<RazorEngineCompiledTemplate> LoadFromFileAsync(string filePath, string templateName)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+
+            using(FileStream fileStream = new FileStream(path: filePath, mode: FileMode.Open))
             {
                 await fileStream.CopyToAsync(memoryStream);
             }
 
-            return new RazorEngineCompiledTemplate(memoryStream, templateNamespace);
+            return new RazorEngineCompiledTemplate(memoryStream, templateName);
         }
 
-        public static RazorEngineCompiledTemplate LoadFromStream(Stream stream)
+        /// <summary>
+        /// Loads a compiled Razor template from a <see cref="Stream" />.
+        /// </summary>
+        /// <param name="stream">A <see cref="Stream" />-instance containing the compiled Razor template.</param>
+        /// <param name="templateName">The name of the template type in the assembly.</param>
+        /// <returns>A read <see cref="RazorEngineCompiledTemplate" />-instance.</returns>
+        public static RazorEngineCompiledTemplate LoadFromStream(Stream stream, string templateName)
         {
-            return LoadFromStreamAsync(stream).GetAwaiter().GetResult();
+            MemoryStream memoryStream = new MemoryStream();
+            stream.CopyTo(memoryStream);
+            memoryStream.Position = 0;
+
+            return new RazorEngineCompiledTemplate(memoryStream, templateName);
         }
 
-        public static async Task<RazorEngineCompiledTemplate> LoadFromStreamAsync(Stream stream, string templateNamespace = "TemplateNamespace")
+        /// <summary>
+        /// Loads a compiled Razor template from a <see cref="Stream" />.
+        /// </summary>
+        /// <param name="stream">A <see cref="Stream" />-instance containing the compiled Razor template.</param>
+        /// <param name="templateName">The name of the template type in the assembly.</param>
+        /// <returns>A <see cref="Task" />, resolving to the read <see cref="RazorEngineCompiledTemplate" />-instance.</returns>
+        public static async Task<RazorEngineCompiledTemplate> LoadFromStreamAsync(Stream stream, string templateName)
         {
             MemoryStream memoryStream = new MemoryStream();
             await stream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
 
-            return new RazorEngineCompiledTemplate(memoryStream, templateNamespace);
+            return new RazorEngineCompiledTemplate(memoryStream, templateName);
         }
 
+        /// <summary>
+        /// Saves the Razor template to a <see cref="Stream" />.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream" />-instance to write the template to.</param>
         public void SaveToStream(Stream stream)
         {
-            this.SaveToStreamAsync(stream).GetAwaiter().GetResult();
+            this.AssemblyByteCode.CopyTo(stream);
         }
 
-        public Task SaveToStreamAsync(Stream stream)
+        /// <summary>
+        /// Saves the Razor template to a <see cref="Stream" />.
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream" />-instance to write the template to.</param>
+        /// <returns>A <see cref="Task" /> representing the copying of the stream.</returns>
+        public async Task SaveToStreamAsync(Stream stream)
         {
-            return this.assemblyByteCode.CopyToAsync(stream);
+            await this.AssemblyByteCode.CopyToAsync(stream);
         }
 
-        public void SaveToFile(string fileName)
+        /// <summary>
+        /// Saves the Razor template to a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file, to which the compiled Razor template should be saved to.</param>
+        public void SaveToFile(string filePath)
         {
-            using(FileStream fileStream = new FileStream(
-                path: fileName,
-                mode: FileMode.OpenOrCreate,
-                access: FileAccess.Write,
-                share: FileShare.None,
-                bufferSize: 4096))
+            using(FileStream fileStream = new FileStream(path: filePath, mode: FileMode.OpenOrCreate))
             {
-                assemblyByteCode.CopyTo(fileStream);
+                AssemblyByteCode.CopyTo(fileStream);
             }
         }
 
-        public Task SaveToFileAsync(string fileName)
+        /// <summary>
+        /// Saves the Razor template to a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file, to which the compiled Razor template should be saved to.</param>
+        /// <returns>A <see cref="Task" /> representing the copying of the stream.</returns>
+        public async Task SaveToFileAsync(string filePath)
         {
-            using(FileStream fileStream = new FileStream(
-                path: fileName,
-                mode: FileMode.OpenOrCreate,
-                access: FileAccess.Write,
-                share: FileShare.None,
-                bufferSize: 4096,
-                useAsync: true))
+            using(FileStream fileStream = new FileStream(path: filePath, mode: FileMode.OpenOrCreate))
             {
-                return assemblyByteCode.CopyToAsync(fileStream);
+                await AssemblyByteCode.CopyToAsync(fileStream);
             }
         }
 
+        /// <summary>
+        /// Execute the template, optionally, with the specified <paramref name="model" /> as a model.
+        /// </summary>
+        /// <param name="model">The optional model to pass to the view.</param>
+        /// <returns>A <see cref="string" /> containing the compiled and executed view.</returns>
         public string Run(object? model = null)
         {
             return this.RunAsync(model).GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// Execute the template, optionally, with the specified <paramref name="model" /> as a model.
+        /// </summary>
+        /// <param name="model">The optional model to pass to the view.</param>
+        /// <returns>A <see cref="Task" />, resolving to a <see cref="string" /> containing the compiled and executed view.</returns>
         public async Task<string> RunAsync(object? model = null)
         {
             if(model != null && model.IsAnonymous())
@@ -101,17 +166,17 @@ namespace RazorEngineCore
                 model = new AnonymousTypeWrapper(model);
             }
 
-            RazorEngineTemplateBase? instance = (RazorEngineTemplateBase?) Activator.CreateInstance(this.templateType);
+            RazorEngineTemplateBase? instance = (RazorEngineTemplateBase?) Activator.CreateInstance(this.TemplateType);
             if(instance == null)
             {
-                throw new OutOfMemoryException($"Failed to create instance of type {this.templateType.Name}");
+                throw new OutOfMemoryException($"Failed to create instance of type {this.TemplateType.Name}");
             }
 
             instance.Model = model;
 
             await instance.ExecuteAsync();
 
-            return await instance.ResultAsync();
+            return instance.Result();
         }
     }
 }

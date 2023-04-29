@@ -10,9 +10,9 @@ namespace RazorEngineCore.Tests
             // Arrange
             var initialTemplate = new RazorEngine().Compile(
                 "@{ var message = \"OK\"; }@message",
-                builder =>
+                options =>
                 {
-                    builder.Options.TemplateNamespace = "Test.Namespace";
+                    options.TemplateNamespace = "Test.Namespace";
                 });
 
             // Act
@@ -28,9 +28,9 @@ namespace RazorEngineCore.Tests
             // Arrange
             var initialTemplate = new RazorEngine().Compile<TestTemplate2>(
                 "@{ var message = \"OK\"; }@message",
-                builder =>
+                options =>
                 {
-                    builder.Options.TemplateNamespace = "Test.Namespace";
+                    options.TemplateNamespace = "Test.Namespace";
                 });
 
             // Act
