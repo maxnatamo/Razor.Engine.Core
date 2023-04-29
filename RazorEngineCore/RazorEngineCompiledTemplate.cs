@@ -2,6 +2,32 @@
 
 namespace RazorEngineCore
 {
+    public class RazorEngineCompiledTemplate<T> : RazorEngineCompiledTemplate where T : RazorEngineTemplateBase
+    {
+        /// <inheritdoc />
+        protected internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateName) : base(assemblyByteCode, templateName)
+        {
+            
+        }
+
+        public string Run(Action<T> initializer)
+            => this.RunAsync(initializer).GetAwaiter().GetResult();
+
+        public async Task<string> RunAsync(Action<T> initializer)
+        {
+            T? instance = (T?) Activator.CreateInstance(this.TemplateType);
+            if(instance == null)
+            {
+                throw new OutOfMemoryException($"Failed to allocate type {this.TemplateType.Name}");
+            }
+
+            initializer(instance);
+
+            await instance.ExecuteAsync();
+            return instance.Result();
+        }
+    }
+
     /// <summary>
     /// Representation of a compiled Razor template assembly.
     /// </summary>
@@ -10,12 +36,12 @@ namespace RazorEngineCore
         /// <summary>
         /// <see cref="MemoryStream" />-instance containing the binary code for the compiled assembly.
         /// </summary>
-        private readonly MemoryStream AssemblyByteCode;
+        protected MemoryStream AssemblyByteCode { get; set; }
 
         /// <summary>
         /// The <see cref="Type" /> of the compiled template.
         /// </summary>
-        private readonly Type TemplateType;
+        protected Type TemplateType { get; set; }
 
         /// <summary>
         /// Initialize a new <see cref="RazorEngineCompiledTemplate" />-instance.
@@ -26,7 +52,7 @@ namespace RazorEngineCore
         /// <exception cref="InvalidDataException">
         /// Thrown if the passed assembly code doesn't contain a type, with the name of <paramref name="templateName" />.
         /// </exception>
-        internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateName)
+        protected internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateName)
         {
             this.AssemblyByteCode = assemblyByteCode;
 
