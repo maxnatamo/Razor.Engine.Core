@@ -1,65 +1,52 @@
-# RazorEngineCore
-.NET6 Razor Template Engine. No legacy code. No breaking changes.
+<h1 align="center">
+  🪒 Razor.Engine.Core
+</h1>
+
+> Compile and execute Razor templates outside MVC applications.
+
+<div align="center">
+  <a href="https://github.com/maxnatamo/RazorEngineCore/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/maxnatamo/RazorEngineCore?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/maxnatamo/RazorEngineCore/blob/main/CONTRIBUTING.md">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" />
+  </a>
+  <br />
+  <a href="https://github.com/maxnatamo/RazorEngineCore/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/maxnatamo/RazorEngineCore/continuous.yml?branch=main&label=Build&style=for-the-badge" />
+  </a>
+  <a href="https://www.nuget.org/packages/Razor.Engine.Core/">
+    <img src="https://img.shields.io/nuget/v/Razor.Engine.Core?label=Dev&style=for-the-badge" />
+  </a>
+  <a href="https://www.nuget.org/packages/Razor.Engine.Core/">
+    <img src="https://img.shields.io/nuget/v/Razor.Engine.Core?label=PROD&style=for-the-badge" />
+  </a>
+</div>
+
+Features:
+* .NET 7.0
 * .NET 6.0
-* .NET 5.0
-* .NET Standard 2.0
-* .NET Framework 4.7.2
 * Windows / Linux
 * Publish as single file supported
 * Thread safe
 
-[![NuGet](https://img.shields.io/nuget/dt/RazorEngineCore.svg?style=flat-square)](https://www.nuget.org/packages/RazorEngineCore)
-[![NuGet](https://img.shields.io/nuget/v/RazorEngineCore.svg?style=flat-square)](https://www.nuget.org/packages/RazorEngineCore)
-[![Gitter](https://img.shields.io/gitter/room/RazorEngineCore/community?style=flat-square)](https://gitter.im/RazorEngineCore/community?utm_source=badge&utm_medium=badge&utm_content=badge)
-
-
-
 Every single star makes maintainer happy! ⭐
 
-## NuGet
+## 🧯 Installation
+
+To use RazorEngineCore in a project, install the package with NuGet:
+
+```sh
+dotnet new install Razor.Engine.Core
 ```
-Install-Package RazorEngineCore
-```
-
-## Feature requests
-✅ Feel free to create new issues and vote for existing ones!
-
-
-## Articles
-* [CodeProject: Building String Razor Template Engine with Bare Hands](https://www.codeproject.com/Articles/5260233/Building-String-Razor-Template-Engine-with-Bare-Ha)
-* [Razor syntax reference](https://docs.microsoft.com/en-us/aspnet/core/mvc/views/razor?view=aspnetcore-6.0)
- 
-## Wiki
-* [Package comparison: RazorEngineCore / RazorLight / RazorEngine.NetCore](https://github.com/adoconnection/RazorEngineCore/wiki/Package-comparison)
-* [Strongly typed model](https://github.com/adoconnection/RazorEngineCore/wiki/Strongly-typed-model)
-* [@Include and @Layout](https://github.com/adoconnection/RazorEngineCore/wiki/@Include-and-@Layout)
-* [@Raw](https://github.com/adoconnection/RazorEngineCore/wiki/@Raw)
-* [@Inject and referencing other assemblies](https://github.com/adoconnection/RazorEngineCore/wiki/@Inject-and-referencing-other-assemblies)
-* [Switch from RazorEngine cshtml templates](https://github.com/adoconnection/RazorEngineCore/wiki/Switch-from-RazorEngine-cshtml-templates)
-* [Azure Functions FileNotFoundException workaround](https://github.com/adoconnection/RazorEngineCore/wiki/Azure-Functions-FileNotFoundException-workaround)
-* [@Html implementation example](https://github.com/adoconnection/RazorEngineCore/wiki/@Html-implementation-example)
-
-## Extensions
-* [wdcossey/RazorEngineCore.Extensions](https://github.com/wdcossey/RazorEngineCore.Extensions)
-	- HTML values encoded by default (See [issue #65](https://github.com/adoconnection/RazorEngineCore/issues/65) and [@Raw](https://github.com/adoconnection/RazorEngineCore/wiki/@Raw))
-	- Template precompiling
-	- Direct model usage without RazorEngineTemplateBase
-	```cs
-	template.Run(object model = null)
-	template.RunAsync(object model = null)
-	template.Run<TModel>(TModel model = null)
-	template.RunAsync<TModel>(TModel model = null)
-	```
-## :boom: HTML Safety
-RazorEngineCore is not HTML safe by default. \
-It can be easily turned on: see [#65](https://github.com/adoconnection/RazorEngineCore/issues/65) and [@Raw](https://github.com/adoconnection/RazorEngineCore/wiki/@Raw)
 
 ## Examples
 
 #### Basic usage
+
 ```cs
-IRazorEngine razorEngine = new RazorEngine();
-IRazorEngineCompiledTemplate template = razorEngine.Compile("Hello @Model.Name");
+RazorEngine razorEngine = new RazorEngine();
+RazorEngineCompiledTemplate template = razorEngine.Compile("Hello @Model.Name");
 
 string result = template.Run(new
 {
@@ -70,12 +57,13 @@ Console.WriteLine(result);
 ```
 
 #### Strongly typed model
+
 ```cs
-IRazorEngine razorEngine = new RazorEngine();
+RazorEngine razorEngine = new RazorEngine();
 string templateText = "Hello @Model.Name";
 
 // yeah, heavy definition
-IRazorEngineCompiledTemplate<RazorEngineTemplateBase<TestModel>> template = razorEngine.Compile<RazorEngineTemplateBase<TestModel>>(templateText);
+RazorEngineCompiledTemplate<RazorEngineTemplateBase<TestModel>> template = razorEngine.Compile<RazorEngineTemplateBase<TestModel>>(templateText);
 
 string result = template.Run(instance =>
 {
@@ -90,27 +78,28 @@ Console.WriteLine(result);
 ```
 
 #### Save / Load compiled templates
+
 Most expensive task is to compile template, you should not compile template every time you need to run it
 ```cs
-IRazorEngine razorEngine = new RazorEngine();
-IRazorEngineCompiledTemplate template = razorEngine.Compile("Hello @Model.Name");
+RazorEngine razorEngine = new RazorEngine();
+RazorEngineCompiledTemplate template = razorEngine.Compile("Hello @Model.Name");
 
-// save to file
+// Save to file
 template.SaveToFile("myTemplate.dll");
 
-//save to stream
+// Save to stream
 MemoryStream memoryStream = new MemoryStream();
 template.SaveToStream(memoryStream);
 ```
 
 ```cs
-IRazorEngineCompiledTemplate template1 = RazorEngineCompiledTemplate.LoadFromFile("myTemplate.dll");
-IRazorEngineCompiledTemplate template2 = RazorEngineCompiledTemplate.LoadFromStream(myStream);
+RazorEngineCompiledTemplate template1 = RazorEngineCompiledTemplate.LoadFromFile("myTemplate.dll");
+RazorEngineCompiledTemplate template2 = RazorEngineCompiledTemplate.LoadFromStream(myStream);
 ```
 
 ```cs
-IRazorEngineCompiledTemplate<MyBase> template1 = RazorEngineCompiledTemplate<MyBase>.LoadFromFile<MyBase>("myTemplate.dll");
-IRazorEngineCompiledTemplate<MyBase> template2 = RazorEngineCompiledTemplate<MyBase>.LoadFromStream<MyBase>(myStream);
+RazorEngineCompiledTemplate<MyBase> template1 = RazorEngineCompiledTemplate<MyBase>.LoadFromFile<MyBase>("myTemplate.dll");
+RazorEngineCompiledTemplate<MyBase> template2 = RazorEngineCompiledTemplate<MyBase>.LoadFromStream<MyBase>(myStream);
 ```
 
 #### Caching
@@ -119,7 +108,7 @@ RazorEngineCore is not responsible for caching. Each team and project has their 
 If you dont have one, use following static ConcurrentDictionary example as a simplest thread safe solution.
 
 ```cs
-private static ConcurrentDictionary<int, IRazorEngineCompiledTemplate> TemplateCache = new ConcurrentDictionary<int, IRazorEngineCompiledTemplate>();
+private static ConcurrentDictionary<int, RazorEngineCompiledTemplate> TemplateCache = new ConcurrentDictionary<int, RazorEngineCompiledTemplate>();
 ```
 
 ```cs
@@ -127,7 +116,7 @@ private string RenderTemplate(string template, object model)
 {
     int hashCode = template.GetHashCode();
 
-    IRazorEngineCompiledTemplate compiledTemplate = TemplateCache.GetOrAdd(hashCode, i =>
+    RazorEngineCompiledTemplate compiledTemplate = TemplateCache.GetOrAdd(hashCode, i =>
     {
         RazorEngine razorEngine = new RazorEngine();
         return razorEngine.Compile(Content);
@@ -138,6 +127,7 @@ private string RenderTemplate(string template, object model)
 ```
 
 #### Template functions
+
 ASP.NET Core way of defining template functions:
 ```
 <area>
@@ -157,7 +147,8 @@ ASP.NET Core way of defining template functions:
   }
 }
 ```
-output:
+
+Output:
 ```
 <div>LEVEL: 3</div>
 <div>LEVEL: 2</div>
@@ -165,11 +156,12 @@ output:
 ```
 
 #### Helpers and custom members
+
 ```cs
 string content = @"Hello @A, @B, @Decorator(123)";
 
-IRazorEngine razorEngine = new RazorEngine();
-IRazorEngineCompiledTemplate<CustomTemplate> template = razorEngine.Compile<CustomTemplate>(content);
+RazorEngine razorEngine = new RazorEngine();
+RazorEngineCompiledTemplate<CustomTemplate> template = razorEngine.Compile<CustomTemplate>(content);
 
 string result = template.Run(instance =>
 {
@@ -179,6 +171,7 @@ string result = template.Run(instance =>
 
 Console.WriteLine(result);
 ```
+
 ```cs
 public class CustomTemplate : RazorEngineTemplateBase
 {
@@ -193,12 +186,13 @@ public class CustomTemplate : RazorEngineTemplateBase
 ```
 
 #### Referencing assemblies
+
 Keep your templates as simple as possible, if you need to inject "unusual" assemblies most likely you are doing it wrong.
 Writing `@using System.IO` in template will not reference System.IO assembly, use builder to manually reference it.
 
 ```cs
-IRazorEngine razorEngine = new RazorEngine();
-IRazorEngineCompiledTemplate compiledTemplate = razorEngine.Compile(templateText, builder =>
+RazorEngine razorEngine = new RazorEngine();
+RazorEngineCompiledTemplate compiledTemplate = razorEngine.Compile(templateText, builder =>
 {
     builder.AddAssemblyReferenceByName("System.Security"); // by name
     builder.AddAssemblyReference(typeof(System.IO.File)); // by type
@@ -208,65 +202,20 @@ IRazorEngineCompiledTemplate compiledTemplate = razorEngine.Compile(templateText
 string result = compiledTemplate.Run(new { name = "Hello" });
 ```
 
+## Extensions
+* [wdcossey/RazorEngineCore.Extensions](https://github.com/wdcossey/RazorEngineCore.Extensions)
+	- HTML values encoded by default
+	- Template precompiling
+	- Direct model usage without RazorEngineTemplateBase
+	```cs
+	template.Run(object model = null)
+	template.RunAsync(object model = null)
+	template.Run<TModel>(TModel model = null)
+	template.RunAsync<TModel>(TModel model = null)
+	```
 
-#### Credits
-This package is inspired by [Simon Mourier SO post](https://stackoverflow.com/a/47756437/267736)
+## 📝 Contributing
 
+If you want to contribute, great! We'd love your help!
 
-#### Changelog
-* 2022.8.1
-	* Proper namespace handling for nested types and types without namespace #113 (thanks [@Kirmiir](https://github.com/Kirmiir))	
-* 2022.1.2
-	* #94 publish as single file fix 	
-* 2022.1.1
-	* Make private methods in RazorEngine protected and virtual #PR88 (thanks [@wdcossey](https://github.com/wdcossey))	
-	* Dictionary bug in anonymous model #91 (thanks [@jddj007-hydra](https://github.com/jddj007-hydra))	
-	* Template name fix #PR84 (thanks [@Yazwh0](https://github.com/Yazwh0))	
-	* CI for GitHub Actions #PR69 (thanks [@304NotModified](https://github.com/304NotModified))	
-	* Added Source Link #PR67 (thanks [@304NotModified](https://github.com/304NotModified))	
-	* Microsoft.AspNetCore.Razor.Language 3.1.8 -> 6.0.1
-	* Microsoft.CodeAnalysis.CSharp 3.7.0 -> 4.0.1
-* 2021.7.1
-	* Better error messages #PR54 (thanks [@wdcossey](https://github.com/wdcossey))	
-	* More asyncs #PR53 (thanks [@wdcossey](https://github.com/wdcossey))
-	* Strong name for assembly #59 (thanks [@garryxiao](https://github.com/garryxiao))
-* 2021.3.1
-	* fixed NET5 publish as single file (thanks [@jddj007-hydra](https://github.com/jddj007-hydra))
-	* AnonymousTypeWrapper array handling fix
-	* System.Collections referenced by default
-	* Microsoft.AspNetCore.Razor.Language 3.1.8 -> 5.0.3
-	* Microsoft.CodeAnalysis.CSharp 3.7.0 -> 3.8.0
-* 2020.10.1
-	* Linux fix for #34
-	* Microsoft.AspNetCore.Razor.Language 3.1.5 -> 3.1.8
-	* Microsoft.CodeAnalysis.CSharp 3.6.0 -> 3.7.0
-* 2020.9.1
-	* .NET 4.7.2 support (thanks [@krmr](https://github.com/krmr))
-* 2020.6.1
-	* Reference assemblies by Metadata (thanks [@Merlin04](https://github.com/Merlin04))
-	* Expose GeneratedCode in RazorEngineCompilationException
-	* Microsoft.AspNetCore.Razor.Language 3.1.4 -> 3.1.5
-* 2020.5.2
-	* IRazorEngineTemplate interface 
-	* RazorEngineTemplateBase methods go virtual
-* 2020.5.1
-	* Async methods (thanks [@wdcossey](https://github.com/wdcossey))
-	* Microsoft.AspNetCore.Razor.Language 3.1.1 -> 3.1.4
-	* Microsoft.CodeAnalysis.CSharp 3.4.0 -> 3.6.0
-* 2020.3.3
-	* Model with generic type arguments compiling fix
-* 2020.3.2
-	* External assembly referencing
-	* Linq included by default
-* 2020.3.1
-	* In attribute rendering fix #4
-* 2020.2.4
-	* Null values in model correct handling
-	* Null model fix
-	* Netstandard2 insted of netcore3.1
-* 2020.2.3
-	* Html attribute rendering fix
-	* Html attribute rendering tests
-
-## Supported by
-<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_square.svg" />
+For more in-depth information on contributing to the project and how to get started, see [CONTRIBUTING](CONTRIBUTING.md).

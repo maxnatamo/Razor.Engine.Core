@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_build", ".build\_build.csproj", "{A344F9A7-F9DE-478E-8CEE-51A55F9AF0B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEngineCore", "RazorEngineCore\RazorEngineCore.csproj", "{7D7836CE-8760-4BC6-80FE-CF6D92592119}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Razor.Engine.Core", "Razor.Engine.Core\Razor.Engine.Core.csproj", "{7D7836CE-8760-4BC6-80FE-CF6D92592119}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RazorEngineCore.Tests", "RazorEngineCore.Tests\RazorEngineCore.Tests.csproj", "{49CFA46F-7013-46D9-8447-17091F6A8314}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Razor.Engine.Core.Tests", "Razor.Engine.Core.Tests\Razor.Engine.Core.Tests.csproj", "{49CFA46F-7013-46D9-8447-17091F6A8314}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,8 +4,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(MSBuildProjectName)' != 'RazorEngineCore'">
-    <ProjectReference Include="../RazorEngineCore/RazorEngineCore.csproj" />
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'Razor.Engine.Core'">
+    <ProjectReference Include="../Razor.Engine.Core/Razor.Engine.Core.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="!$(MSBuildProjectName.EndsWith('Tests'))">
