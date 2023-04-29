@@ -32,15 +32,6 @@ partial class Build : NukeBuild
                 .SetIncludeSymbols(false)
                 .SetIncludeSource(false)
                 .SetDescription("Razor Templating Engine for .NET Core")
-                .SetAuthors(
-                    "Alexander Selishchev",
-                    "Simon Mourier",
-                    "William David Cossey",
-                    "Benjamin Smith",
-                    "Dag H. Baardsen",
-                    "krmr",
-                    "jddj007-hydra",
-                    "Max T. Kristiansen")
                 .SetPackageTags("razor template templating c# core library")
                 .SetPackageProjectUrl("https://github.com/maxnatamo/RazorEngineCore")
                 .SetNoDependencies(false)
