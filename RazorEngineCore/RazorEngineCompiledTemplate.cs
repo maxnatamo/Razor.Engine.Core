@@ -6,9 +6,7 @@ namespace RazorEngineCore
     {
         /// <inheritdoc />
         protected internal RazorEngineCompiledTemplate(MemoryStream assemblyByteCode, string templateName) : base(assemblyByteCode, templateName)
-        {
-            
-        }
+        { }
 
         public string Run(Action<T> initializer)
             => this.RunAsync(initializer).GetAwaiter().GetResult();
